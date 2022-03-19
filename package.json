@@ -1,13 +1,14 @@
 {
   "name": "codelab",
   "displayName": "codelab",
-  "description": "Assist in program practice classes",
+  "description": "Assist in programming practice classes",
   "version": "0.0.1",
   "keywords": [
-    "download",
-    "file",
-    "url",
-    "get"
+    "class",
+    "asist",
+    "practice",
+    "programming",
+    "codelab"
   ],
   "engines": {
     "vscode": "^1.65.0"
@@ -16,7 +17,11 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.downloadFile"
+    "onCommand:extension.downloadFile",
+    "onCommand:extension.fetchProblem",
+    "onCommand:extension.uploadProblem",
+    "onCommand:extension.submitCode",
+    "onCommand:extension.codelabLogin"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -24,6 +29,22 @@
       {
         "command": "extension.downloadFile",
         "title": "Download File"
+      },
+      {
+        "command": "extension.fetchProblem",
+        "title": "Fetch Problem"
+      },
+      {
+        "command": "extension.uploadProblem",
+        "title": "Upload Problem"
+      },
+      {
+        "command": "extension.submitCode",
+        "title": "Submit Code"
+      },
+      {
+        "command": "extension.codelabLogin",
+        "title": "Codelab Login"
       }
     ],
     "configuration": {
@@ -33,6 +54,11 @@
           "type": "string",
           "default": "",
           "description": "Default folder where file should be saved."
+        },
+        "url.uploadCode": {
+          "type":"string",
+          "defuult": "http://203.245.41.143:5000/api/v1/problems/",
+          "description": "Code upload base url"
         }
       }
     }

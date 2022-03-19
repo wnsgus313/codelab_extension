@@ -20,9 +20,28 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.uploadProblem', () => {
+		
+		const configParams = vscode.workspace.getConfiguration('url'),
+			url = configParams.get('uploadCode') as string;
+		
+		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to upload.' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
+		uploadProblem(parseInt(res));
+		});
+	});
+	context.subscriptions.push(disposable);
 }
 
-function fetchAndSaveFile(fileURL, dest) {
+function uploadProblem(problemId:number) {
+	
+}
+
+function fetchAndSaveFile(fileURL:string, dest:string) {
 	const timeout = 10000,
 		urlParsed = url.parse(fileURL),
 		uri = urlParsed.pathname.split('/');
@@ -61,11 +80,11 @@ function fetchAndSaveFile(fileURL, dest) {
 
 		response.on("end", function(){
 			vscode.window.showInformationMessage(`File "${filename}" downloaded successfully.`);
-		})
+		});
 
 		request.setTimeout(timeout, function () {
 			request.abort();
-		})
+		});
 
 	}).on('error', function(e) {
 		vscode.window.showErrorMessage(`Downloading ${fileURL} failed! Please make sure URL is valid.`);
