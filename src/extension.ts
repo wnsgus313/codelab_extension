@@ -24,60 +24,48 @@ export function activate(context: vscode.ExtensionContext) {
 
 	disposable = vscode.commands.registerCommand('extension.uploadProblem', () => {
 		
-		const configParams = vscode.workspace.getConfiguration('url'),
-			url = configParams.get('uploadCode') as string;
+		const configParamsUrl = vscode.workspace.getConfiguration('url'),
+			url = configParamsUrl.get('uploadCode') as string;
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+		
 		
 		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to upload.' }).then((res) => {
 		if (!res) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		uploadProblem(url+res, parseInt(res));
+		uploadProblem(url+res, parseInt(res), workSpaceFolder + res);
 		});
 	});
 	context.subscriptions.push(disposable);
 }
 
-function uploadProblem(url:string, problemId:number) {
+function uploadProblem(url:string, problemId:number, workSpaceFolder:string) {
 	const axios = require('axios');
-	
-	let code = fs.readFileSync('/Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/a.c', "binary");
-	const files = {
-		'filename': 'a.c',
-		'file': code
+	console.log(workSpaceFolder); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
+
+	let fileLists:string[] = fs.readdirSync(workSpaceFolder);
+
+	let files = {
+		'filename': '',
+		'file': ''
 	};
-	console.log(code);
-	axios.post(url, {files});
 
-	// const timeout = 10000;
-	// let req = http;
-	// let opts = {
-	// 	hostname: 'siskin21.cafe24.com', 
-	// 	port: 80,
-	// 	method: 'POST',
-	// 	path: '/codelab/api/v1/problems/'+problemId,
-	// };
+	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
 
-	// console.log(url, problemId, opts);
-	// let request = req.request(opts, function(response) {
-	// 	console.log("in");
-	// 	if (response.statusCode !== 200) {
-	// 		vscode.window.showErrorMessage(`Upload problem ${url} failed`);
-	// 	}
+	fileLists.forEach((file) => {
+		files['filename'] = file;
+		files['file'] = fs.readFileSync(workSpaceFolder+'/'+file, "binary");
 
-	// 	response.on("end", function(){
-	// 		vscode.window.showInformationMessage(`Problem "${problemId}" upload successfully.`);
-	// 	});
-
-
-	// 	request.setTimeout(timeout, function () {
-	// 		request.abort();
-	// 	});
-	// }).on('error', function(e) {
-	// 	vscode.window.showErrorMessage(`Uploding ${problemId} failed! Please make sure URL is valid.`);
-	// });
-
-	// console.log(request);
+		axios.post(url, {files})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`${file} upload successfully.`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Upload ${file} failed`);
+		});
+	});
 }
 
 function fetchAndSaveFile(fileURL:string, dest:string) {
