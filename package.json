@@ -18,6 +18,7 @@
   ],
   "activationEvents": [
     "onCommand:extension.fetchAndSaveProblem",
+    "onCommand:extension.deleteProblem",
     "onCommand:extension.uploadProblem",
     "onCommand:extension.submitCode",
     "onCommand:extension.codelabLogin"
@@ -32,6 +33,10 @@
       {
         "command": "extension.uploadProblem",
         "title": "Upload Problem"
+      },
+      {
+        "command": "extension.deleteProblem",
+        "title": "Delete Problem"
       },
       {
         "command": "extension.submitCode",

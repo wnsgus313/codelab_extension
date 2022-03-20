@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		fetchAndSaveFile(url+res, parseInt(res), workSpaceFolder + res);
+		fetchAndSaveProblem(url+res, parseInt(res), workSpaceFolder + res);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -40,6 +40,25 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		uploadProblem(url+res, parseInt(res), workSpaceFolder + res);
+		});
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.deleteProblem', () => {
+		
+		const configParamsUrl = vscode.workspace.getConfiguration('url'),
+			url = configParamsUrl.get('codeUrl') as string;
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+		
+		
+		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to delete.' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
+		deleteProblem(url+res, parseInt(res));
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -71,7 +90,7 @@ function uploadProblem(url:string, problemId:number, targetPath:string) {
 	});
 }
 
-function fetchAndSaveFile(url:string, problemId:number, targetPath:string) {
+function fetchAndSaveProblem(url:string, problemId:number, targetPath:string) {
 	const axios = require('axios');
 	console.log(targetPath);
 
@@ -86,12 +105,24 @@ function fetchAndSaveFile(url:string, problemId:number, targetPath:string) {
 			axios.get(url + '/' + filename)
 			.then((res:any) => {
 				fs.writeFileSync(saveFilePath, res.data);
+				vscode.window.showInformationMessage(`${filename} save successfully.`);
 			})
 			.catch((err:any) => {
 				vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${problemId}`);
 			});
 		});
 
+	}).catch((err:any) => {
+		vscode.window.showErrorMessage(`Please check Problem Id : ${problemId}`);
+	});
+}
+
+function deleteProblem(url:string, problemId:number) {
+	const axios = require('axios');
+
+	axios.delete(url)
+	.then((res:any) => {
+		vscode.window.showInformationMessage(`${problemId} delete successfully.`);
 	}).catch((err:any) => {
 		vscode.window.showErrorMessage(`Please check Problem Id : ${problemId}`);
 	});
