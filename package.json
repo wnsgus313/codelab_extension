@@ -17,8 +17,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.downloadFile",
-    "onCommand:extension.fetchProblem",
+    "onCommand:extension.fetchAndSaveProblem",
     "onCommand:extension.uploadProblem",
     "onCommand:extension.submitCode",
     "onCommand:extension.codelabLogin"
@@ -27,12 +26,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.downloadFile",
-        "title": "Download File"
-      },
-      {
-        "command": "extension.fetchProblem",
-        "title": "Fetch Problem"
+        "command": "extension.fetchAndSaveProblem",
+        "title": "Fetch and SaveProblem"
       },
       {
         "command": "extension.uploadProblem",
@@ -50,12 +45,7 @@
     "configuration": {
       "title": "Download File Configuration",
       "properties": {
-        "download-file.defaultFolder": {
-          "type": "string",
-          "default": "",
-          "description": "Default folder where file should be saved."
-        },
-        "url.uploadCode": {
+        "url.codeUrl": {
           "type": "string",
           "default": "http://203.245.41.143:5000/api/v1/problems/",
           "description": "Code upload base url"
