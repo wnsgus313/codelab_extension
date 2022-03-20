@@ -4,6 +4,7 @@ import * as url from "url";
 import * as mkdirp from "mkdirp";
 import * as http from "http";
 import * as https from "https";
+import * as axios from "axios";
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.downloadFile', () => {
@@ -31,14 +32,52 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		uploadProblem(parseInt(res));
+		uploadProblem(url+res, parseInt(res));
 		});
 	});
 	context.subscriptions.push(disposable);
 }
 
-function uploadProblem(problemId:number) {
+function uploadProblem(url:string, problemId:number) {
+	const axios = require('axios');
 	
+	let code = fs.readFileSync('/Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/a.c', "binary");
+	const files = {
+		'filename': 'a.c',
+		'file': code
+	};
+	console.log(code);
+	axios.post(url, {files});
+
+	// const timeout = 10000;
+	// let req = http;
+	// let opts = {
+	// 	hostname: 'siskin21.cafe24.com', 
+	// 	port: 80,
+	// 	method: 'POST',
+	// 	path: '/codelab/api/v1/problems/'+problemId,
+	// };
+
+	// console.log(url, problemId, opts);
+	// let request = req.request(opts, function(response) {
+	// 	console.log("in");
+	// 	if (response.statusCode !== 200) {
+	// 		vscode.window.showErrorMessage(`Upload problem ${url} failed`);
+	// 	}
+
+	// 	response.on("end", function(){
+	// 		vscode.window.showInformationMessage(`Problem "${problemId}" upload successfully.`);
+	// 	});
+
+
+	// 	request.setTimeout(timeout, function () {
+	// 		request.abort();
+	// 	});
+	// }).on('error', function(e) {
+	// 	vscode.window.showErrorMessage(`Uploding ${problemId} failed! Please make sure URL is valid.`);
+	// });
+
+	// console.log(request);
 }
 
 function fetchAndSaveFile(fileURL:string, dest:string) {
@@ -66,7 +105,7 @@ function fetchAndSaveFile(fileURL:string, dest:string) {
 
 		if (response.statusCode === 200) {
 
-		mkdirp(dest, function(err) { 
+		mkdirp(dest, function(err: any) { 
 			if (err) {
 				throw err;
 			}

@@ -56,8 +56,8 @@
           "description": "Default folder where file should be saved."
         },
         "url.uploadCode": {
-          "type":"string",
-          "defuult": "http://203.245.41.143:5000/api/v1/problems/",
+          "type": "string",
+          "default": "http://203.245.41.143:5000/api/v1/problems/",
           "description": "Code upload base url"
         }
       }
@@ -90,5 +90,8 @@
     "typescript": "^4.5.5",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "axios": "^0.26.1"
   }
 }
