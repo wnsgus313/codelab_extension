@@ -2,12 +2,15 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as url from "url";
 import * as axios from "axios";
+import * as cheerio from "cheerio";
+import { getVSCodeDownloadUrl } from '@vscode/test-electron/out/util';
+import { stringify } from 'querystring';
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', () => {
 		
-		const configParamsUrl = vscode.workspace.getConfiguration('url'),
-			url = configParamsUrl.get('problemsUrl') as string;
+		const configParamsUrl = vscode.workspace.getConfiguration('url');
+		let url = configParamsUrl.get('problemsUrl') as string;
 		
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
@@ -17,7 +20,11 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
+
 		fetchAndSaveProblem(url+res, res, workSpaceFolder + res);
+
+		url =  configParamsUrl.get('contentUrl') as string;
+		fetchProblemContent(url+res);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -109,6 +116,11 @@ function uploadProblem(url:string, title:string, targetPath:string) {
 function fetchAndSaveProblem(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
 	console.log(targetPath);
+	console.log (url);
+
+	if (fs.existsSync(targetPath)){
+		return;
+	}
 
 	axios.get(url)
 	.then((res:any) => {
@@ -170,6 +182,41 @@ function submitCode(url:string, title:string, targetPath:string) {
 		});
 	});
 }
+
+
+async function fetchProblemContent(url: string) {
+	const axios = require('axios');
+	console.log(url);
+
+	const res = await axios.get(url);
+	const data = res.data;
+	const $ = cheerio.load(data);
+	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
+
+	const panel = vscode.window.createWebviewPanel(
+		'problemContent',
+		title,
+		vscode.ViewColumn.Beside,
+		{}
+	);
+	
+	panel.webview.html = getWebviewContent(title, name, body);
+}
+function getWebviewContent(title:string, name:string, body:string) {
+	return `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>${title}</title>
+	</head>
+	<body>
+		<h2>[${title}] ${name}</h2>
+		<p>${body}</p>
+	</body>
+	</html>`;
+	}
+
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
