@@ -1,16 +1,13 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as url from "url";
-import * as mkdirp from "mkdirp";
-import * as http from "http";
-import * as https from "https";
 import * as axios from "axios";
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', () => {
 		
 		const configParamsUrl = vscode.workspace.getConfiguration('url'),
-			url = configParamsUrl.get('codeUrl') as string;
+			url = configParamsUrl.get('problemsUrl') as string;
 		
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
@@ -20,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		fetchAndSaveProblem(url+res, parseInt(res), workSpaceFolder + res);
+		fetchAndSaveProblem(url+res, res, workSpaceFolder + res);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -28,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 	disposable = vscode.commands.registerCommand('extension.uploadProblem', () => {
 		
 		const configParamsUrl = vscode.workspace.getConfiguration('url'),
-			url = configParamsUrl.get('codeUrl') as string;
+			url = configParamsUrl.get('problemsUrl') as string;
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
@@ -39,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		uploadProblem(url+res, parseInt(res), workSpaceFolder + res);
+		uploadProblem(url+res, res, workSpaceFolder + res);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -47,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 	disposable = vscode.commands.registerCommand('extension.deleteProblem', () => {
 		
 		const configParamsUrl = vscode.workspace.getConfiguration('url'),
-			url = configParamsUrl.get('codeUrl') as string;
+			url = configParamsUrl.get('problemsUrl') as string;
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
@@ -58,13 +55,32 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		deleteProblem(url+res, parseInt(res));
+		deleteProblem(url+res, res);
+		});
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.submitCode', () => {
+		
+		const configParamsUrl = vscode.workspace.getConfiguration('url'),
+			url = configParamsUrl.get('codesUrl') as string;
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+		
+		
+		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to code upload.' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
+		submitCode(url + '21700332/' + res, res, workSpaceFolder + res);
 		});
 	});
 	context.subscriptions.push(disposable);
 }
 
-function uploadProblem(url:string, problemId:number, targetPath:string) {
+function uploadProblem(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
 	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
 
@@ -90,7 +106,7 @@ function uploadProblem(url:string, problemId:number, targetPath:string) {
 	});
 }
 
-function fetchAndSaveProblem(url:string, problemId:number, targetPath:string) {
+function fetchAndSaveProblem(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
 	console.log(targetPath);
 
@@ -108,26 +124,52 @@ function fetchAndSaveProblem(url:string, problemId:number, targetPath:string) {
 				vscode.window.showInformationMessage(`${filename} save successfully.`);
 			})
 			.catch((err:any) => {
-				vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${problemId}`);
+				vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
 			});
 		});
 
 	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`Please check Problem Id : ${problemId}`);
+		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
 	});
 }
 
-function deleteProblem(url:string, problemId:number) {
+function deleteProblem(url:string, title:string) {
 	const axios = require('axios');
 
 	axios.delete(url)
 	.then((res:any) => {
-		vscode.window.showInformationMessage(`${problemId} delete successfully.`);
+		vscode.window.showInformationMessage(`${title} delete successfully.`);
 	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`Please check Problem Id : ${problemId}`);
+		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
 	});
 }
 
+function submitCode(url:string, title:string, targetPath:string) {
+	const axios = require('axios');
+	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
+	console.log(url);
+
+	let fileLists:string[] = fs.readdirSync(targetPath);
+
+	let files = {
+		'filename': '',
+		'file': ''
+	};
+
+	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
+
+	fileLists.forEach((file) => {
+		files['filename'] = file;
+		files['file'] = fs.readFileSync(targetPath+'/'+file, "binary");
+
+		axios.post(url, {files})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`${file} upload successfully.`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Upload ${file} failed`);
+		});
+	});
+}
 
 // this method is called when your extension is deactivated
 export function deactivate() {}

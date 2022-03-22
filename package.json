@@ -50,7 +50,7 @@
     "configuration": {
       "title": "Download File Configuration",
       "properties": {
-        "url.codeUrl": {
+        "url.problemsUrl": {
           "type": "string",
           "default": "http://203.245.41.143:5000/api/v1/problems/",
           "description": "Code upload base url"
@@ -59,6 +59,11 @@
           "type": "string",
           "default": "",
           "description": "Default folder where workspace"
+        },
+        "url.codesUrl": {
+          "type": "string",
+          "default": "http://203.245.41.143:5000/api/v1/student_codes/",
+          "description": "Code upload base url"
         }
       }
     }
