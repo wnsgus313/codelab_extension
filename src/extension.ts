@@ -3,8 +3,10 @@ import * as fs from 'fs';
 import * as url from "url";
 import * as axios from "axios";
 import * as cheerio from "cheerio";
-import { getVSCodeDownloadUrl } from '@vscode/test-electron/out/util';
-import { stringify } from 'querystring';
+
+import {uploadProblem, fetchAndSaveProblem, deleteProblem} from './problems';
+import {fetchProblemContent} from './codes';
+
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', () => {
@@ -87,74 +89,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-function uploadProblem(url:string, title:string, targetPath:string) {
-	const axios = require('axios');
-	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
-
-	let fileLists:string[] = fs.readdirSync(targetPath);
-
-	let files = {
-		'filename': '',
-		'file': ''
-	};
-
-	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
-
-	fileLists.forEach((file) => {
-		files['filename'] = file;
-		files['file'] = fs.readFileSync(targetPath+'/'+file, "binary");
-
-		axios.post(url, {files})
-		.then((res:any) => {
-			vscode.window.showInformationMessage(`${file} upload successfully.`);
-		}).catch((err:any) => {
-			vscode.window.showErrorMessage(`Upload ${file} failed`);
-		});
-	});
-}
-
-function fetchAndSaveProblem(url:string, title:string, targetPath:string) {
-	const axios = require('axios');
-	console.log(targetPath);
-	console.log (url);
-
-	if (fs.existsSync(targetPath)){
-		return;
-	}
-
-	axios.get(url)
-	.then((res:any) => {
-		if(!fs.existsSync(targetPath)){
-			fs.mkdirSync(targetPath);
-		}
-
-		res.data['file_list'].forEach((filename:string) => {
-			const saveFilePath = targetPath + '/' + filename;
-			axios.get(url + '/' + filename)
-			.then((res:any) => {
-				fs.writeFileSync(saveFilePath, res.data);
-				vscode.window.showInformationMessage(`${filename} save successfully.`);
-			})
-			.catch((err:any) => {
-				vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
-			});
-		});
-
-	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
-	});
-}
-
-function deleteProblem(url:string, title:string) {
-	const axios = require('axios');
-
-	axios.delete(url)
-	.then((res:any) => {
-		vscode.window.showInformationMessage(`${title} delete successfully.`);
-	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
-	});
-}
 
 function submitCode(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
@@ -172,7 +106,7 @@ function submitCode(url:string, title:string, targetPath:string) {
 
 	fileLists.forEach((file) => {
 		files['filename'] = file;
-		files['file'] = fs.readFileSync(targetPath+'/'+file, "binary");
+		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
 
 		axios.post(url, {files})
 		.then((res:any) => {
@@ -183,25 +117,6 @@ function submitCode(url:string, title:string, targetPath:string) {
 	});
 }
 
-
-async function fetchProblemContent(url: string) {
-	const axios = require('axios');
-	console.log(url);
-
-	const res = await axios.get(url);
-	const data = res.data;
-	const $ = cheerio.load(data);
-	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
-
-	const panel = vscode.window.createWebviewPanel(
-		'problemContent',
-		title,
-		vscode.ViewColumn.Beside,
-		{}
-	);
-	
-	panel.webview.html = getWebviewContent(title, name, body);
-}
 function getWebviewContent(title:string, name:string, body:string) {
 	return `<!DOCTYPE html>
 	<html lang="en">
@@ -215,7 +130,7 @@ function getWebviewContent(title:string, name:string, body:string) {
 		<p>${body}</p>
 	</body>
 	</html>`;
-	}
+}
 
 
 // this method is called when your extension is deactivated
