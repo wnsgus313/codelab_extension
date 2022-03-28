@@ -2,6 +2,9 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as url from "url";
 import * as axios from "axios";
+import * as cheerio from "cheerio";
+
+import {getWebviewContent} from './views';
 
 export function uploadProblem(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
@@ -70,4 +73,23 @@ export function deleteProblem(url:string, title:string) {
 	}).catch((err:any) => {
 		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
 	});
+}
+
+export async function fetchProblemContent(url: string) {
+	const axios = require('axios');
+	console.log(url);
+
+	const res = await axios.get(url);
+	const data = res.data;
+	const $ = cheerio.load(data);
+	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
+
+	const panel = vscode.window.createWebviewPanel(
+		'problemContent',
+		title,
+		vscode.ViewColumn.Beside,
+		{}
+	);
+	
+	panel.webview.html = getWebviewContent(title, name, body);
 }

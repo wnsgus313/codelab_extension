@@ -1,22 +1,31 @@
 import * as vscode from 'vscode';
-import * as cheerio from "cheerio";
+import * as fs from 'fs';
+
 import {getWebviewContent} from './views';
 
-export async function fetchProblemContent(url: string) {
+export function submitCode(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
+	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
 	console.log(url);
 
-	const res = await axios.get(url);
-	const data = res.data;
-	const $ = cheerio.load(data);
-	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
+	let fileLists:string[] = fs.readdirSync(targetPath);
 
-	const panel = vscode.window.createWebviewPanel(
-		'problemContent',
-		title,
-		vscode.ViewColumn.Beside,
-		{}
-	);
-	
-	panel.webview.html = getWebviewContent(title, name, body);
+	let files = {
+		'filename': '',
+		'file': ''
+	};
+
+	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
+
+	fileLists.forEach((file) => {
+		files['filename'] = file;
+		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+
+		axios.post(url, {files})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`${file} upload successfully.`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Upload ${file} failed`);
+		});
+	});
 }
