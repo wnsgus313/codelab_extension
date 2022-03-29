@@ -21,7 +21,9 @@
     "onCommand:extension.deleteProblem",
     "onCommand:extension.uploadProblem",
     "onCommand:extension.submitCode",
-    "onCommand:extension.codelabLogin"
+    "onCommand:extension.codelabLogin",
+    "onCommand:extension.codelabAuthentication",
+    "onAuthenticationRequest:codelabPAT"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -45,6 +47,10 @@
       {
         "command": "extension.codelabLogin",
         "title": "Codelab Login"
+      },
+      {
+        "command": "extension.codelabAuthentication",
+        "title": "Codelab Authentication"
       }
     ],
     "configuration": {
