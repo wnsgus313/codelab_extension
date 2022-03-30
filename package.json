@@ -75,6 +75,11 @@
           "type": "string",
           "default": "http://203.245.41.143:5000/problems/",
           "description": "Fetch content base url"
+        },
+        "url.rootUrl": {
+          "type": "string",
+          "default": "http://203.245.41.143:5000/",
+          "description": "Root url"
         }
       }
     }
