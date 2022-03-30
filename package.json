@@ -23,7 +23,9 @@
     "onCommand:extension.submitCode",
     "onCommand:extension.codelabLogin",
     "onCommand:extension.codelabAuthentication",
-    "onAuthenticationRequest:codelabPAT"
+    "onAuthenticationRequest:codelabPAT",
+    "onCommand:extension.getInfo",
+    "onCommand:extension.printInfo"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -51,6 +53,14 @@
       {
         "command": "extension.codelabAuthentication",
         "title": "Codelab Authentication"
+      },
+      {
+        "command": "extension.getInfo",
+        "title": "Get User Info"
+      },
+      {
+        "command": "extension.printInfo",
+        "title": "Print User Info"
       }
     ],
     "configuration": {

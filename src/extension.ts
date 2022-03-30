@@ -3,13 +3,22 @@ import * as fs from 'fs';
 
 import {uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent} from './problems';
 import {submitCode} from './codes';
+import {askUserUrl, askUserForEmail, askUserForPassword, askUserForSave} from './data';
 
 
 export function activate(context: vscode.ExtensionContext) {
+
+	const info = context.globalState;
+
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', () => {
 		
-		const configParamsUrl = vscode.workspace.getConfiguration('url');
-		let url = configParamsUrl.get('problemsUrl') as string;
+		// const configParamsUrl = vscode.workspace.getConfiguration('url');
+		// let url:string | undefined = configParamsUrl.get('problemsUrl') as string;
+		
+		let url:string | undefined;
+		if (info.get('url')) {
+			url = info.get('url') + '/api/v1/problems/';
+		} 
 		
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
@@ -22,7 +31,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		fetchAndSaveProblem(url+res, res, workSpaceFolder + res);
 
-		url =  configParamsUrl.get('contentUrl') as string;
+		// url = configParamsUrl.get('contentUrl') as string;
+		if (info.get('url')) {
+			url = info.get('url') + '/problems/';
+		} 
 		fetchProblemContent(url+res);
 		});
 	});
@@ -111,6 +123,22 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 	context.subscriptions.push(disposable);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.getInfo', () => {
+
+			askUserForSave(info);
+
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.printInfo', () => {
+			console.log(info.get('url'));
+			console.log(info.get('email'));
+			console.log(info.get('password'));
+		})
+	);
 }
 
 // this method is called when your extension is deactivated
