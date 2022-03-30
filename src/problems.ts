@@ -6,9 +6,11 @@ import * as cheerio from "cheerio";
 
 import {getWebviewContent} from './views';
 
-export function uploadProblem(url:string, title:string, targetPath:string) {
+export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
 	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
+
+	const token = await info.get('token');
 
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
@@ -23,7 +25,7 @@ export function uploadProblem(url:string, title:string, targetPath:string) {
 		files['filename'] = file;
 		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
 
-		axios.post(url, {files})
+		axios.post(url, {files}, {auth: {username:token}})
 		.then((res:any) => {
 			vscode.window.showInformationMessage(`${file} upload successfully.`);
 		}).catch((err:any) => {
@@ -32,16 +34,18 @@ export function uploadProblem(url:string, title:string, targetPath:string) {
 	});
 }
 
-export function fetchAndSaveProblem(url:string, title:string, targetPath:string) {
+export async function fetchAndSaveProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
 	console.log(targetPath);
 	console.log (url);
+
+	const token = await info.get('token');
 
 	if (fs.existsSync(targetPath)){
 		return;
 	}
 
-	axios.get(url, {auth: {username:"21700332@handong.edu", password:"123"}})
+	axios.get(url, {auth: {username:token}})
 	.then((res:any) => {
 		if(!fs.existsSync(targetPath)){
 			fs.mkdirSync(targetPath);
@@ -49,7 +53,7 @@ export function fetchAndSaveProblem(url:string, title:string, targetPath:string)
 
 		res.data['file_list'].forEach((filename:string) => {
 			const saveFilePath = targetPath + '/' + filename;
-			axios.get(url + '/' + filename, {auth: {username:"21700332@handong.edu", password:"123"}})
+			axios.get(url + '/' + filename, {auth: {username:token}})
 			.then((res:any) => {
 				fs.writeFileSync(saveFilePath, res.data);
 				vscode.window.showInformationMessage(`${filename} save successfully.`);
@@ -64,10 +68,12 @@ export function fetchAndSaveProblem(url:string, title:string, targetPath:string)
 	});
 }
 
-export function deleteProblem(url:string, title:string) {
+export async function deleteProblem(url:string, title:string, info:vscode.Memento) {
 	const axios = require('axios');
 
-	axios.delete(url)
+	const token = await info.get('token');
+
+	axios.delete(url, {auth: {username:token}})
 	.then((res:any) => {
 		vscode.window.showInformationMessage(`${title} delete successfully.`);
 	}).catch((err:any) => {
