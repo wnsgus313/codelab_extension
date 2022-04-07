@@ -81,6 +81,7 @@ export async function deleteProblem(url:string, title:string, info:vscode.Mement
 	});
 }
 
+// 문제 content 가져오기
 export async function fetchProblemContent(url: string) {
 	const axios = require('axios');
 	console.log(url);
@@ -98,4 +99,18 @@ export async function fetchProblemContent(url: string) {
 	);
 	
 	panel.webview.html = getWebviewContent(title, name, body);
+}
+
+export async function fetchProblemList(url: string | undefined, targetPath: string, info: any) {
+	const axios = require('axios');
+	const token = await info.get('token');
+
+	axios.get(url, {auth: {username:token}})
+	.then((res:any) => {
+		console.log(JSON.stringify(res.data));
+		fs.writeFileSync(targetPath, JSON.stringify(res.data));
+
+	}).catch((err:any) => {
+		vscode.window.showErrorMessage(`fetch problem list failed`);
+	});
 }

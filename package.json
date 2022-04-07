@@ -22,68 +22,109 @@
     "onCommand:extension.uploadProblem",
     "onCommand:extension.submitCode",
     "onCommand:extension.codelabLogin",
-    "onCommand:extension.codelabAuthentication",
-    "onAuthenticationRequest:codelabPAT",
+    "onCommand:extension.codelabSignUp",
     "onCommand:extension.getInfo",
-    "onCommand:extension.printInfo"
+    "onCommand:extension.printInfo",
+    "onView:code-labhub-login",
+    "onView:solved"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "extension.fetchAndSaveProblem",
-        "title": "Fetch and SaveProblem"
+        "title": "Fetch and SaveProblem",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.uploadProblem",
-        "title": "Upload Problem"
+        "title": "Upload Problem",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.deleteProblem",
-        "title": "Delete Problem"
+        "title": "Delete Problem",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.submitCode",
-        "title": "Submit Code"
+        "title": "Submit Code",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.codelabLogin",
-        "title": "Codelab Login"
+        "title": "Codelab Login",
+        "category": "Code LabHub"
       },
       {
-        "command": "extension.codelabAuthentication",
-        "title": "Codelab Authentication"
+        "command": "extension.codelabSignUp",
+        "title": "Codelab Sign Up",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.getInfo",
-        "title": "Get User Info"
+        "title": "Get User Info",
+        "category": "Code LabHub"
       },
       {
         "command": "extension.printInfo",
-        "title": "Print User Info"
+        "title": "Print User Info",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "problemProvider.refreshProblems",
+        "title": "Refresh Problems",
+        "icon": {
+          "dark": "media/dark/refresh.svg",
+					"light": "media/light/refresh.svg"
+        }
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "package-explorer",
+          "id": "code-labhub",
           "title": "Code LabHub",
           "icon": "media/dep.png"
         }
       ]
     },
     "views": {
-      "package-explorer": [
+      "code-labhub": [
         {
-          "id": "package-dependencies",
+          "id": "solved",
+          "name": "solved"
+        },
+        {
+          "id": "problem-solve",
           "name": "Problem to Solve"
         },
         {
-          "id": "package-outline",
+          "id": "problem-resolved",
           "name": "Resolved Problem"
+        },
+        {
+          "id": "code-labhub-login",
+          "name": "Login"
         }
       ]
     },
+    "menus": {
+			"view/title": [
+				{
+					"command": "problemProvider.refreshProblems",
+          "when": "view == problem-solve",
+					"group": "navigation"
+				}
+			]
+    },
+
+    "viewsWelcome": [
+      {
+        "view": "code-labhub-login",
+        "contents": "You are not currently logged in to an account\n[Login](command:extension.getInfo)"
+      }
+    ],
     
     "configuration": {
       "title": "Download File Configuration",
