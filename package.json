@@ -63,6 +63,28 @@
         "title": "Print User Info"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Code LabHub",
+          "icon": "media/dep.png"
+        }
+      ]
+    },
+    "views": {
+      "package-explorer": [
+        {
+          "id": "package-dependencies",
+          "name": "Problem to Solve"
+        },
+        {
+          "id": "package-outline",
+          "name": "Resolved Problem"
+        }
+      ]
+    },
+    
     "configuration": {
       "title": "Download File Configuration",
       "properties": {
