@@ -5,7 +5,7 @@ import * as path from 'path';
 import {uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList} from './problems';
 import {submitCode} from './codes';
 import {askUserForSave} from './data';
-import { SolvedProblems } from './treeView';
+import { ReSolvedProblems, SolvedProblems } from './treeView';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -14,8 +14,12 @@ export function activate(context: vscode.ExtensionContext) {
 			? vscode.workspace.workspaceFolders[0].uri.fsPath
 			: undefined;
 
-	vscode.window.createTreeView('solved', {
+	vscode.window.createTreeView('problem-resolved', {
 		treeDataProvider: new SolvedProblems(rootPath),
+	});
+
+	vscode.window.createTreeView('problem-solve', {
+		treeDataProvider: new ReSolvedProblems(rootPath),
 	});
 
 	const info = context.globalState;
@@ -182,17 +186,20 @@ export function activate(context: vscode.ExtensionContext) {
 		let url:string | undefined;
 		if (info.get('url')) {
 			url = info.get('url') + problemListUrl;
-		} 
+		}
+
+		const solvedProvider = new SolvedProblems(rootPath);
+		const resolvedProvider = new ReSolvedProblems(rootPath);
+		vscode.window.registerTreeDataProvider('problem-solve', solvedProvider);
+		vscode.window.registerTreeDataProvider('problem-resolved', resolvedProvider);
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 
 		await fetchProblemList(url, workSpaceFolder + '/problem_list.json', info);
-
-		const solvedProblems = new SolvedProblems(rootPath);
-		vscode.window.registerTreeDataProvider('solved', solvedProblems);
-		solvedProblems.refresh();
-
+		
+		solvedProvider.refresh();
+		resolvedProvider.refresh();
 	});
 	context.subscriptions.push(disposable);
 
