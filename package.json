@@ -78,6 +78,10 @@
           "dark": "media/dark/refresh.svg",
 					"light": "media/light/refresh.svg"
         }
+      },
+      {
+        "command": "extension.refreshEntry",
+        "title": "Refresh Solved Problem List"
       }
     ],
     "viewsContainers": {
