@@ -139,11 +139,6 @@
           "command": "extension.deleteProblem",
           "when": "view == problem-solve || view == problem-resolved",
           "group": "2_professor"
-        },
-        {
-          "command": "extension.uploadProblem",
-          "when": "view == problem-solve || view == problem-resolved",
-          "group": "2_professor"
         }
       ]
     },
