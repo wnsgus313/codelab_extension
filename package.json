@@ -25,7 +25,8 @@
     "onCommand:extension.codelabSignUp",
     "onCommand:extension.getInfo",
     "onCommand:extension.printInfo",
-    "onView:code-labhub-login"
+    "onView:code-labhub-login",
+    "onView:code-labhub-logout"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -77,6 +78,11 @@
           "dark": "media/dark/refresh.svg",
 					"light": "media/light/refresh.svg"
         }
+      },
+      {
+        "command": "extension.logout",
+        "title": "Logout",
+        "category": "Code LabHub"
       }
     ],
     "viewsContainers": {
@@ -100,7 +106,13 @@
         },
         {
           "id": "code-labhub-login",
-          "name": "Login"
+          "name": "Login",
+          "when": "!extensionSelectionMode"
+        },
+        {
+          "id": "code-labhub-logout",
+          "name": "Logout",
+          "when": "extensionSelectionMode"
         }
       ]
     },
@@ -111,13 +123,41 @@
           "when": "view == problem-solve",
 					"group": "navigation"
 				}
-			]
+			],
+      "view/item/context": [
+        {
+          "command": "extension.fetchAndSaveProblem",
+          "when": "view == problem-solve || view == problem-resolved",
+          "group": "1_student"
+        },
+        {
+          "command": "extension.submitCode",
+          "when": "view == problem-solve || view == problem-resolved",
+          "group": "1_student"
+        },
+        {
+          "command": "extension.deleteProblem",
+          "when": "view == problem-solve || view == problem-resolved",
+          "group": "2_professor"
+        },
+        {
+          "command": "extension.uploadProblem",
+          "when": "view == problem-solve || view == problem-resolved",
+          "group": "2_professor"
+        }
+      ]
     },
 
     "viewsWelcome": [
       {
         "view": "code-labhub-login",
-        "contents": "You are not currently logged in to an account\n[Login](command:extension.getInfo)"
+        "contents": "You are not currently logged in to an account\n[Login](command:extension.getInfo)",
+        "when": "!extensionSelectionMode"
+      },
+      {
+        "view": "code-labhub-logout",
+        "contents": "You are currently logged in to an account\n[Logout](command:extension.logout)",
+        "when": "extensionSelectionMode"
       }
     ],
     

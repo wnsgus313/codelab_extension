@@ -46,3 +46,25 @@ export async function saveToken(info: vscode.Memento) {
 		vscode.window.showErrorMessage(`Can not save Token`);
 	});
 }
+
+export async function logout(info: any) {
+
+	await info.update('url', );
+	await info.update('email', );
+	await info.update('password', );
+	await info.update('token', );
+}
+
+export async function changestatusTrue(info: any) {
+
+	if (info.get('token') !== undefined)
+	{
+		await vscode.commands.executeCommand('setContext', 'extensionSelectionMode', true);
+	}
+
+}
+
+export function changestatusFalse(info: any) {
+
+	vscode.commands.executeCommand('setContext', 'extensionSelectionMode', false);
+}

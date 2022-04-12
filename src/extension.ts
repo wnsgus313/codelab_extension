@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import {uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList} from './problems';
 import {submitCode} from './codes';
-import {askUserForSave} from './data';
+import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
 import { ReSolvedProblems, SolvedProblems } from './treeView';
 
 
@@ -164,10 +164,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.getInfo', () => {
+		vscode.commands.registerCommand('extension.getInfo', async () => {
+			await askUserForSave(info);
 
-			askUserForSave(info);
-
+			await changestatusTrue(info);
 		})
 	);
 
@@ -180,6 +180,13 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.logout', () => {
+			logout(info);
+
+			changestatusFalse(info);
+		})
+	);
 
 	// problem list 새로고침
 	disposable = vscode.commands.registerCommand('problemProvider.refreshProblems', async () => {
@@ -192,6 +199,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const resolvedProvider = new ReSolvedProblems(rootPath);
 		vscode.window.registerTreeDataProvider('problem-solve', solvedProvider);
 		vscode.window.registerTreeDataProvider('problem-resolved', resolvedProvider);
+
+		solvedProvider.refresh();
+		resolvedProvider.refresh();
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
