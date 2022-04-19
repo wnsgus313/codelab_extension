@@ -107,7 +107,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		let res: any = item.label;
 
-		submitCode(url + '21700332/' + res, res, workSpaceFolder + res, info);
+		submitCode(url + `${info.get('email')}` + '/' + res, res, workSpaceFolder + res, info);
 	});
 	context.subscriptions.push(disposable);
 
@@ -141,7 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		submitCode(url + '21700332/' + res, res, workSpaceFolder + res, info);
+		submitCode(url + `${info.get('email')}` + '/' + res, res, workSpaceFolder + res, info);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -196,6 +196,48 @@ export function activate(context: vscode.ExtensionContext) {
 		resolvedProvider.refresh();
 	});
 	context.subscriptions.push(disposable);
+
+	let alreadyOpened = false;
+	let previewMd = "";
+	let closeOtherEditor = "";
+	closeOtherEditor = "workbench.action.closeEditorsInOtherGroups"; // 이거 안하면 바로 닫힘
+	previewMd = "markdown.showPreviewToSide";  // 미리보기로 보여주는 것
+	function previewFirstMarkdown() {
+		if (alreadyOpened) {
+			return;
+		}
+		let editor = vscode.window.activeTextEditor;
+		if (editor) {
+			let doc = editor.document;
+			if (doc && doc.languageId === "markdown") {
+				openMarkdownPreviewSideBySide();
+				alreadyOpened = true;
+			}
+		}
+	}
+	function openMarkdownPreviewSideBySide() {		
+		vscode.commands.executeCommand(closeOtherEditor)
+			.then(() => vscode.commands.executeCommand(previewMd))
+			.then(() => closeExistingEditor())  // 미리보기 말고 그냥 md 파일 닫기
+			.then(() => { }, (e) => console.error(e));
+	}
+	function closeExistingEditor() {
+		vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+	}
+
+	if (vscode.window.activeTextEditor) {
+		previewFirstMarkdown();
+	} else {
+		vscode.window.onDidChangeActiveTextEditor(() => {
+			previewFirstMarkdown();
+		});
+	}
+
+	vscode.workspace.onDidOpenTextDocument((doc) => {
+		if (doc && doc.languageId === "markdown") {
+			openMarkdownPreviewSideBySide();
+		}
+	});
 
 }
 
