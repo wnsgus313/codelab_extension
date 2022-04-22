@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as url from "url";
 import * as axios from "axios";
 import * as cheerio from "cheerio";
+import * as path from "path";
 
 import {getWebviewContent} from './views';
 
@@ -14,23 +15,31 @@ export async function uploadProblem(url:string, title:string, targetPath:string,
 
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
-	let files = {
-		'filename': '',
-		'file': ''
-	};
-
 	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
 
+	let filedata:string[] = [];
+	let filename:string[] = [];
 	fileLists.forEach((file) => {
-		files['filename'] = file;
-		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+		filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
+		filename.push(file);
 
-		axios.post(url, {files}, {auth: {username:token}})
-		.then((res:any) => {
-			vscode.window.showInformationMessage(`${file} upload successfully.`);
-		}).catch((err:any) => {
-			vscode.window.showErrorMessage(`Upload ${file} failed`);
-		});
+		// files['filename'] = file;
+		// files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+	});
+
+	let files = {
+		'filename': filedata,
+		'file': filename,
+	};
+
+	// dir 최초 삭제
+	axios.delete(url, {auth: {username:token}});
+
+	axios.post(url, {files}, {auth: {username:token}})
+	.then((res:any) => {
+		vscode.window.showInformationMessage(`Problem upload successfully.`);
+	}).catch((err:any) => {
+		vscode.window.showErrorMessage(`Problem upload failed`);
 	});
 }
 
