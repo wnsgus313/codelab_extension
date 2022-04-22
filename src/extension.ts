@@ -5,7 +5,7 @@ import * as path from 'path';
 import {uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList} from './problems';
 import {submitCode} from './codes';
 import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
-import { Dependency, ReSolvedProblems, SolvedProblems } from './treeView';
+import { ReSolvedProblems, SolvedProblems } from './treeView';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -28,7 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const contentUrl = 'problems/';
 	const problemListUrl = 'api/v1/problems/list';
 
-	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', (item: vscode.TreeItem) => {
+	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', () => {
+		
 		// const configParamsUrl = vscode.workspace.getConfiguration('url');
 		// let url:string | undefined = configParamsUrl.get('problemsUrl') as string;
 		
@@ -40,7 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
-		let res: any = item.label;
+		vscode.window.showInputBox({ prompt: 'Enter file URL you wish to download' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
 
 		fetchAndSaveProblem(url+res, res, workSpaceFolder + res, info);
 
@@ -49,6 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 			url = info.get('url') + contentUrl;
 		} 
 		fetchProblemContent(url+res);
+		});
 	});
 	context.subscriptions.push(disposable);
 
@@ -76,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 
-	disposable = vscode.commands.registerCommand('extension.deleteProblem', (item: vscode.TreeItem) => {
+	disposable = vscode.commands.registerCommand('extension.deleteProblem', () => {
 		// const configParamsUrl = vscode.workspace.getConfiguration('url'),
 		// 	url = configParamsUrl.get('problemsUrl') as string;
 		let url:string | undefined;
@@ -87,27 +93,43 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
-		let res: any = item.label;
-
+		
+		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to delete.' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
 		deleteProblem(url+res, res, info);
+		});
 	});
 	context.subscriptions.push(disposable);
 
 
-	disposable = vscode.commands.registerCommand('extension.submitCode', (item: vscode.TreeItem) => {
+	disposable = vscode.commands.registerCommand('extension.submitCode', () => {
 		// const configParamsUrl = vscode.workspace.getConfiguration('url'),
 		// 	url = configParamsUrl.get('codesUrl') as string;
 		let url:string | undefined;
 		if (info.get('url')) {
 			url = info.get('url') + codesUrl;
-		}
+		} 
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
+<<<<<<< HEAD
 		let res: any = item.label;
 
 		submitCode(url + `${info.get('email')}` + '/' + res, res, workSpaceFolder + res, info);
+=======
+		
+		vscode.window.showInputBox({ prompt: 'Enter the problem ID you want to code upload.' }).then((res) => {
+		if (!res) {
+			vscode.window.showErrorMessage("Please enter problem ID!");
+			return;
+		}
+		submitCode(url + '21700332/' + res, res, workSpaceFolder + res);
+		});
+>>>>>>> parent of d7eefe7 (tree view use mouse)
 	});
 	context.subscriptions.push(disposable);
 
@@ -141,7 +163,11 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
+<<<<<<< HEAD
 		submitCode(url + `${info.get('email')}` + '/' + res, res, workSpaceFolder + res, info);
+=======
+		submitCode(url + '21700332/' + res, res, workSpaceFolder + res);
+>>>>>>> parent of d7eefe7 (tree view use mouse)
 		});
 	});
 	context.subscriptions.push(disposable);

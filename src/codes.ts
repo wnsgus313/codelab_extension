@@ -3,12 +3,11 @@ import * as fs from 'fs';
 
 import {getWebviewContent} from './views';
 
-export async function submitCode(url:string, title:string, targetPath:string, info:vscode.Memento) {
+export function submitCode(url:string, title:string, targetPath:string) {
 	const axios = require('axios');
 	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
 	console.log(url);
 
-	const token = await info.get('token');
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
 	let files = {
@@ -22,7 +21,7 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 		files['filename'] = file;
 		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
 
-		axios.post(url, {files}, {auth: {username:token}})
+		axios.post(url, {files})
 		.then((res:any) => {
 			vscode.window.showInformationMessage(`${file} upload successfully.`);
 		}).catch((err:any) => {
