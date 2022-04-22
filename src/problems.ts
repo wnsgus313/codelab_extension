@@ -91,8 +91,6 @@ export async function fetchProblemContent(url: string) {
 	const $ = cheerio.load(data);
 	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
 
-	vscode.window.showInformationMessage(url);
-
 	const panel = vscode.window.createWebviewPanel(
 		'problemContent',
 		title,
