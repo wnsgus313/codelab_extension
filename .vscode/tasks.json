@@ -38,15 +38,6 @@
 				"npm: watch-tests"
 			],
 			"problemMatcher": []
-		},
-		{
-			"type": "gulp",
-			"task": "default",
-			"problemMatcher": [],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
 		}
 	]
 }
