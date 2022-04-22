@@ -111,6 +111,6 @@ export async function fetchProblemList(url: string | undefined, targetPath: stri
 		fs.writeFileSync(targetPath, JSON.stringify(res.data));
 
 	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`fetch problem list failed`);
+		vscode.window.showErrorMessage(`fetch problem list failed!`);
 	});
 }
