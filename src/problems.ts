@@ -33,7 +33,12 @@ export async function uploadProblem(url:string, title:string, targetPath:string,
 	};
 
 	// dir 최초 삭제
-	axios.delete(url, {auth: {username:token}});
+	await axios.delete(url, {auth: {username:token}})
+	.then((res:any) =>{
+
+	}).catch((err:any) => {
+		
+	});
 
 	axios.post(url, {files}, {auth: {username:token}})
 	.then((res:any) => {
