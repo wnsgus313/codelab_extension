@@ -9,8 +9,8 @@ import {getWebviewContent} from './views';
 
 export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
-	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
-
+	console.log(targetPath + 'aaa'); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
+	
 	const token = await info.get('token');
 
 	let fileLists:string[] = fs.readdirSync(targetPath);
