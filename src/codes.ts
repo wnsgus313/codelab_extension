@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 
 import {getWebviewContent} from './views';
 
@@ -9,24 +10,39 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 	console.log(url);
 
 	const token = await info.get('token');
+
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
+	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
+	console.log('zzzz');
+	let filedata:string[] = [];
+	let filename:string[] = [];
+	fileLists.forEach((file) => {
+		filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
+		filename.push(file);
+
+		// files['filename'] = file;
+		// files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+	});
+
 	let files = {
-		'filename': '',
-		'file': ''
+		'filename': filename,
+		'file': filedata,
 	};
 
 	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
 
-	fileLists.forEach((file) => {
-		files['filename'] = file;
-		files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+	await axios.delete(url, {auth: {username:token}})
+	.then((res:any) =>{
 
-		axios.post(url, {files}, {auth: {username:token}})
-		.then((res:any) => {
-			vscode.window.showInformationMessage(`${file} upload successfully.`);
-		}).catch((err:any) => {
-			vscode.window.showErrorMessage(`Upload ${file} failed`);
-		});
+	}).catch((err:any) => {
+		
+	});
+
+	axios.post(url, {files}, {auth: {username:token}})
+	.then((res:any) => {
+		vscode.window.showInformationMessage(`Code upload successfully.`);
+	}).catch((err:any) => {
+		vscode.window.showErrorMessage(`Code upload failed`);
 	});
 }
