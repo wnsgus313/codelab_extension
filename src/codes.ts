@@ -30,7 +30,7 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 		'file': filedata,
 	};
 
-	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
+	console.log(filename); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
 
 	await axios.delete(url, {auth: {username:token}})
 	.then((res:any) =>{
