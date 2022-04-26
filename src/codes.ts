@@ -14,7 +14,7 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
 	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
-	console.log('zzzz');
+
 	let filedata:string[] = [];
 	let filename:string[] = [];
 	fileLists.forEach((file) => {
@@ -41,7 +41,7 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 
 	axios.post(url, {files}, {auth: {username:token}})
 	.then((res:any) => {
-		vscode.window.showInformationMessage(`Code upload successfully.`);
+		vscode.window.showInformationMessage(res.data['message']);
 	}).catch((err:any) => {
 		vscode.window.showErrorMessage(`Code upload failed`);
 	});
