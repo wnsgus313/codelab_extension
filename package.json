@@ -26,7 +26,8 @@
     "onCommand:extension.getInfo",
     "onCommand:extension.printInfo",
     "onView:code-labhub-login",
-    "onView:code-labhub-logout"
+    "onView:code-labhub-logout",
+    "onLanguage:markdown"
   ],
   "main": "./dist/extension.js",
   "contributes": {
