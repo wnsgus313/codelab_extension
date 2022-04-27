@@ -67,4 +67,5 @@ export async function changestatusTrue(info: any) {
 export function changestatusFalse(info: any) {
 
 	vscode.commands.executeCommand('setContext', 'extensionSelectionMode', false);
+
 }

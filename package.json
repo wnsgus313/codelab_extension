@@ -32,6 +32,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "extension.saveStudentsCodes",
+        "title": "Fetch and SaveCode",
+        "category": "Code LabHub"
+      },
+      {
         "command": "extension.fetchAndSaveProblem",
         "title": "Fetch and SaveProblem",
         "category": "Code LabHub"
@@ -97,6 +102,10 @@
     "views": {
       "code-labhub": [
         {
+          "id": "problem-all",
+          "name": "All Problems"
+        },
+        {
           "id": "problem-solve",
           "name": "Problem to Solve"
         },
@@ -120,24 +129,29 @@
 			"view/title": [
 				{
 					"command": "problemProvider.refreshProblems",
-          "when": "view == problem-solve",
+          "when": "view == problem-all",
 					"group": "navigation"
 				}
 			],
       "view/item/context": [
         {
           "command": "extension.fetchAndSaveProblem",
-          "when": "view == problem-solve || view == problem-resolved",
+          "when": "view == problem-all || view == problem-solve || view == problem-resolved",
           "group": "1_student"
         },
         {
           "command": "extension.submitCode",
-          "when": "view == problem-solve || view == problem-resolved",
+          "when": "view == problem-all || view == problem-solve || view == problem-resolved",
           "group": "1_student"
         },
         {
           "command": "extension.deleteProblem",
-          "when": "view == problem-solve || view == problem-resolved",
+          "when": "view == problem-all || view == problem-solve || view == problem-resolved",
+          "group": "2_professor"
+        },
+        {
+          "command": "extension.saveStudentsCodes",
+          "when": "view == problem-all || view == problem-solve || view == problem-resolved",
           "group": "2_professor"
         }
       ]

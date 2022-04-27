@@ -2,10 +2,10 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList} from './problems';
+import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList, fetchAndSaveCode, fetchProblemCode } from './problems';
 import {submitCode} from './codes';
 import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
-import { Dependency, ReSolvedProblems, SolvedProblems } from './treeView';
+import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -27,6 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const codesUrl = 'api/v1/student_codes/';
 	const contentUrl = 'problems/';
 	const problemListUrl = 'api/v1/problems/list';
+	
 
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', (item: vscode.TreeItem) => {
 		// const configParamsUrl = vscode.workspace.getConfiguration('url');
@@ -49,6 +50,30 @@ export function activate(context: vscode.ExtensionContext) {
 			url = info.get('url') + contentUrl;
 		} 
 		fetchProblemContent(url+res);
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.saveStudentsCodes', (item: vscode.TreeItem) => {
+
+		let url: string | undefined;
+		if (info.get('url')) {
+			url = info.get('url') + codesUrl;
+		}
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		let res: any = item.label;
+
+		vscode.window.showInformationMessage(res);
+
+		// res는 문제 타이틀로 된 디렉토리 이름 -> 이 안에서 있는 모든 디렉토리 안에 들어가서 파일 다운 받아야함
+		// fetchAndSaveCode(url + res, res, workSpaceFolder + res, info);
+
+		// if (info.get('url')) {
+		// 	url = info.get('url') + contentUrl;
+		// }
+		// fetchProblemCode(url + res);
 	});
 	context.subscriptions.push(disposable);
 
@@ -179,11 +204,14 @@ export function activate(context: vscode.ExtensionContext) {
 			url = info.get('url') + problemListUrl;
 		}
 
+		const allProvider = new AllProblems(rootPath);
 		const solvedProvider = new SolvedProblems(rootPath);
 		const resolvedProvider = new ReSolvedProblems(rootPath);
+		vscode.window.registerTreeDataProvider('problem-all', allProvider);
 		vscode.window.registerTreeDataProvider('problem-solve', solvedProvider);
 		vscode.window.registerTreeDataProvider('problem-resolved', resolvedProvider);
 
+		allProvider.refresh();
 		solvedProvider.refresh();
 		resolvedProvider.refresh();
 
@@ -192,6 +220,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		await fetchProblemList(url, workSpaceFolder + '/problem_list.json', info);
 		
+		allProvider.refresh();
 		solvedProvider.refresh();
 		resolvedProvider.refresh();
 	});
