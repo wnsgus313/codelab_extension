@@ -28,8 +28,10 @@
     "onView:code-labhub-login",
     "onView:code-labhub-logout",
     "onLanguage:markdown",
-
-    "onView:codelabChat.view"
+    "onView:codelabChat.view",
+    "onCommand:chronicler.record",
+    "onCommand:chronicler.recordWithAudio",
+    "onCommand:chronicler.stop"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -84,13 +86,33 @@
         "title": "Refresh Problems",
         "icon": {
           "dark": "media/dark/refresh.svg",
-					"light": "media/light/refresh.svg"
+          "light": "media/light/refresh.svg"
         }
       },
       {
         "command": "extension.logout",
         "title": "Logout",
         "category": "Code LabHub"
+      },
+      {
+        "title": "Start Recording",
+        "category": "Chronicler",
+        "command": "chronicler.record"
+      },
+      {
+        "title": "Start Recording with Audio",
+        "category": "Chronicler",
+        "command": "chronicler.recordWithAudio"
+      },
+      {
+        "title": "Stop Recording",
+        "category": "Chronicler",
+        "command": "chronicler.stop"
+      },
+      {
+        "title": "Save Exam",
+        "category": "Code LabHub",
+        "command": "extension.saveExam"
       }
     ],
     "viewsContainers": {
@@ -127,25 +149,30 @@
           "when": "extensionSelectionMode"
         },
         {
-					"type": "webview",
-					"id": "codelabChat.view",
-					"name": "vsChat",
-					"icon": "img/icon.svg",
-					"contextualTitle": "vsChat"
-				}
+          "type": "webview",
+          "id": "codelabChat.view",
+          "name": "vsChat",
+          "icon": "img/icon.svg",
+          "contextualTitle": "vsChat"
+        }
       ]
     },
     "menus": {
-			"view/title": [
-				{
-					"command": "problemProvider.refreshProblems",
+      "view/title": [
+        {
+          "command": "problemProvider.refreshProblems",
           "when": "view == problem-all",
-					"group": "navigation"
-				}
-			],
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "extension.fetchAndSaveProblem",
+          "when": "view == problem-all || view == problem-solve || view == problem-resolved",
+          "group": "1_student"
+        },
+        {
+          "command": "extension.saveExam",
           "when": "view == problem-all || view == problem-solve || view == problem-resolved",
           "group": "1_student"
         },
@@ -166,7 +193,6 @@
         }
       ]
     },
-
     "viewsWelcome": [
       {
         "view": "code-labhub-login",
@@ -179,7 +205,6 @@
         "when": "extensionSelectionMode"
       }
     ],
-    
     "configuration": {
       "title": "Download File Configuration",
       "properties": {
@@ -241,6 +266,7 @@
   },
   "dependencies": {
     "axios": "^0.26.1",
-    "cheerio": "^1.0.0-rc.10"
+    "cheerio": "^1.0.0-rc.10",
+    "edit-json-file": "^1.7.0"
   }
 }

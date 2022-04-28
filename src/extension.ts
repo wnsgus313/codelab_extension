@@ -28,7 +28,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const codesUrl = 'api/v1/student_codes/';
 	const contentUrl = 'problems/';
 	const problemListUrl = 'api/v1/problems/list';
-	
+	const editJsonFile = require("edit-json-file");
+	const home = process.env.HOME || process.env.USERPROFILE;
+
+	const fileName = editJsonFile(`${home}/Library/Application\ Support/Code/User/settings.json`);
+
 
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', (item: vscode.TreeItem) => {
 		// const configParamsUrl = vscode.workspace.getConfiguration('url');
@@ -51,6 +55,36 @@ export function activate(context: vscode.ExtensionContext) {
 			url = info.get('url') + contentUrl;
 		} 
 		fetchProblemContent(url+res);
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.saveExam', (item: vscode.TreeItem) => {
+		// const configParamsUrl = vscode.workspace.getConfiguration('url');
+		// let url:string | undefined = configParamsUrl.get('problemsUrl') as string;
+
+		let url: string | undefined;
+		if (info.get('url')) {
+			url = info.get('url') + problemsUrl;
+		}
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		let res: any = item.label;
+
+		fetchAndSaveProblem(url + res, res, workSpaceFolder + res, info);
+
+		// url = configParamsUrl.get('contentUrl') as string;
+		if (info.get('url')) {
+			url = info.get('url') + contentUrl;
+		}
+		fetchProblemContent(url + res);
+
+		fileName.set("chronicler.dest-folder", workSpaceFolder + res);
+
+		fileName.save();
+
+		vscode.commands.executeCommand('chronicler.recordWithAudio');
 	});
 	context.subscriptions.push(disposable);
 
