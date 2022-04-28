@@ -6,6 +6,7 @@ import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent,
 import {submitCode} from './codes';
 import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
+import { VsChatProvider } from "./vsChatProvider";
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -267,7 +268,14 @@ export function activate(context: vscode.ExtensionContext) {
 			openMarkdownPreviewSideBySide();
 		}
 	});
-
+	
+	const vsChatSidebarProvider = new VsChatProvider(context.extensionUri, info);
+	let sidebar = vscode.window.registerWebviewViewProvider(
+		"codelabChat.view",
+		vsChatSidebarProvider
+	  );
+	
+	  context.subscriptions.push(sidebar);
 }
 
 // this method is called when your extension is deactivated

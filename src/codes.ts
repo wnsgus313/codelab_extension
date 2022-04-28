@@ -44,5 +44,7 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 		vscode.window.showInformationMessage(res.data['message']);
 	}).catch((err:any) => {
 		vscode.window.showErrorMessage(`Code upload failed`);
+	}).finally(() => {
+		vscode.commands.executeCommand("problemProvider.refreshProblems");
 	});
 }

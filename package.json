@@ -27,7 +27,9 @@
     "onCommand:extension.printInfo",
     "onView:code-labhub-login",
     "onView:code-labhub-logout",
-    "onLanguage:markdown"
+    "onLanguage:markdown",
+
+    "onView:codelabChat.view"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -123,7 +125,14 @@
           "id": "code-labhub-logout",
           "name": "Logout",
           "when": "extensionSelectionMode"
-        }
+        },
+        {
+					"type": "webview",
+					"id": "codelabChat.view",
+					"name": "vsChat",
+					"icon": "img/icon.svg",
+					"contextualTitle": "vsChat"
+				}
       ]
     },
     "menus": {
