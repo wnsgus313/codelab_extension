@@ -17,18 +17,18 @@ export async function uploadVideo(url:string, title:string, targetPath:string, i
         }
 	});
 
-
-    // formData.append('file', fs.createReadStream(path.join(targetPath, 'test.mp4')), 'video.mp4');
     const auth = 'Basic ' + Buffer.from(token + ':').toString('base64');
 
-    got.post(url, {
-        body: formData,
-        headers: {
-            "Authorization": auth
-        }
-    }).then((res:any) => {
-        vscode.window.showInformationMessage(res.data['message']);
-    }).catch((err:any) => {
+    try {
+        let res = await got.post(url, {
+            body: formData,
+            headers: {
+                "Authorization": auth
+            }
+        });
+    
+        vscode.window.showInformationMessage('Sucess upload video');
+    } catch (e) {
         vscode.window.showErrorMessage(`Video upload failed`);
-    });
+    }
 }
