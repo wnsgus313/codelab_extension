@@ -7,6 +7,7 @@ import {submitCode} from './codes';
 import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 import { VsChatProvider } from "./vsChatProvider";
+import {uploadVideo} from "./videos";
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -28,6 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const codesUrl = 'api/v1/student_codes/';
 	const contentUrl = 'problems/';
 	const problemListUrl = 'api/v1/problems/list';
+	const videoUrl = 'api/v1/video/';
 	const editJsonFile = require("edit-json-file");
 	const home = process.env.HOME || process.env.USERPROFILE;
 
@@ -307,9 +309,27 @@ export function activate(context: vscode.ExtensionContext) {
 	let sidebar = vscode.window.registerWebviewViewProvider(
 		"codelabChat.view",
 		vsChatSidebarProvider
-	  );
+	);
 	
-	  context.subscriptions.push(sidebar);
+	context.subscriptions.push(sidebar);
+
+
+	disposable = vscode.commands.registerCommand('extension.uploadExam', (item: vscode.TreeItem) => {
+		let url: string | undefined;
+		if (info.get('url')) {
+			url = info.get('url') + videoUrl;
+		}
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		let res: any = item.label;
+		// vscode.commands.executeCommand("problemProvider.submitCode", res);
+
+		uploadVideo(url + res, res, workSpaceFolder + res, info);
+
+	});
+	context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
