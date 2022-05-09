@@ -31,11 +31,24 @@
     "onView:codelabChat.view",
     "onCommand:chronicler.record",
     "onCommand:chronicler.recordWithAudio",
-    "onCommand:chronicler.stop"
+    "onCommand:chronicler.stop",
+    "onCommand:extension.saveStudentsCodes",
+    "onCommand:extension.sendText",
+    "onCommand:extension.stopText"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "extension.sendText",
+        "title": "Start Training",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "extension.stopText",
+        "title": "Stop Training",
+        "category": "Code LabHub"
+      },
       {
         "command": "extension.saveStudentsCodes",
         "title": "Fetch and SaveCode",
@@ -279,6 +292,9 @@
     "cheerio": "^1.0.0-rc.10",
     "edit-json-file": "^1.7.0",
     "form-data": "^4.0.0",
-    "got": "^12.0.4"
+    "got": "^12.0.4",
+    "node-schedule": "^2.1.0",
+    "promise-queue": "^2.2.5",
+    "vscode-cache": "^0.3.0"
   }
 }

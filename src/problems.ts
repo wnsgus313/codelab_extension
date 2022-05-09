@@ -32,14 +32,6 @@ export async function uploadProblem(url:string, title:string, targetPath:string,
 		'file': filedata,
 	};
 
-	// dir 최초 삭제
-	await axios.delete(url, {auth: {username:token}})
-	.then((res:any) =>{
-
-	}).catch((err:any) => {
-		
-	});
-
 	axios.post(url, {files}, {auth: {username:token}})
 	.then((res:any) => {
 		vscode.window.showInformationMessage(`Problem upload successfully.`);
@@ -131,8 +123,6 @@ export async function fetchProblemList(url: string | undefined, targetPath: stri
 
 export async function fetchAndSaveCode(url: string, title: string, targetPath: string, info: vscode.Memento) {
 	const axios = require('axios');
-	console.log(targetPath);
-	console.log(url);
 
 	const token = await info.get('token');
 
@@ -140,44 +130,45 @@ export async function fetchAndSaveCode(url: string, title: string, targetPath: s
 		return;
 	}
 
-	axios.get(url, { auth: { username: token } })
-		.then((res: any) => {
-			if (!fs.existsSync(targetPath)) {
-				fs.mkdirSync(targetPath);
-			}
-
-			res.data['file_list'].forEach((filename: string) => {
-				const saveFilePath = targetPath + '/' + res + '/' + filename;
-				axios.get(url + '/' + filename, { auth: { username: token } })
-					.then((res: any) => {
-						fs.writeFileSync(saveFilePath, res.data);
-						vscode.window.showInformationMessage(`${filename} save successfully.`);
-					})
-					.catch((err: any) => {
-						vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
-					});
-			});
-
-		}).catch((err: any) => {
-			vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
-		});
-}
-
-export async function fetchProblemCode(url: string) {
-	const axios = require('axios');
+	vscode.window.showInformationMessage(url);
+	
 	console.log(url);
+	console.log(title);
+	console.log(targetPath);
+	
+	// axios.get(url, { auth: {username: token} })
+	// .then((res: any) => {
+	// 	if (!fs.existsSync(targetPath)) {
+	// 		fs.mkdirSync(targetPath);
+	// 	}
 
-	const res = await axios.get(url);
-	const data = res.data;
-	const $ = cheerio.load(data);
-	const title = $('#title').text(), name = $('#name').text(), body = $('#body').text();
+	// 	res.data['users_id'].forEach((userId: string) => {
+	// 		console.log(userId);
+	// 		vscode.window.showInformationMessage(userId);
+	// 	});
+	// });
 
-	const panel = vscode.window.createWebviewPanel(
-		'problemContent',
-		title,
-		vscode.ViewColumn.Beside,
-		{}
-	);
+	// axios.get(url, { auth: { username: token } })
+	// 	.then((res: any) => {
+	// 		if (!fs.existsSync(targetPath)) {
+	// 			fs.mkdirSync(targetPath);
+	// 		}
 
-	panel.webview.html = getWebviewContent(title, name, body);
+	// 		res.data['file_list'].forEach((filename: string) => {
+	// 			for (const id in allStudent) {
+	// 				const saveFilePath = targetPath + '/' + id + '/' + filename;
+	// 				axios.get(url + '/' + id + '/' + filename, { auth: { username: token } })
+	// 					.then((res: any) => {
+	// 						fs.writeFileSync(saveFilePath, res.data);
+	// 						vscode.window.showInformationMessage(`${filename} save successfully.`);
+	// 					})
+	// 					.catch((err: any) => {
+	// 						vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
+	// 					});
+	// 			}
+	// 		});
+
+	// 	}).catch((err: any) => {
+	// 		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
+	// 	});
 }

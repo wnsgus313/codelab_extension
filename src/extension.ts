@@ -2,12 +2,13 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList, fetchAndSaveCode, fetchProblemCode } from './problems';
+import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList, fetchAndSaveCode } from './problems';
 import {submitCode} from './codes';
 import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 import { VsChatProvider } from "./vsChatProvider";
 import {uploadVideo} from "./videos";
+import { Document } from 'cheerio';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -34,7 +35,6 @@ export function activate(context: vscode.ExtensionContext) {
 	const home = process.env.HOME || process.env.USERPROFILE;
 
 	const fileName = editJsonFile(`${home}/Library/Application\ Support/Code/User/settings.json`);
-
 
 	let disposable = vscode.commands.registerCommand('extension.fetchAndSaveProblem', (item: vscode.TreeItem) => {
 		// const configParamsUrl = vscode.workspace.getConfiguration('url');
@@ -102,10 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 		let res: any = item.label;
 
-		vscode.window.showInformationMessage(res);
-
 		// res는 문제 타이틀로 된 디렉토리 이름 -> 이 안에서 있는 모든 디렉토리 안에 들어가서 파일 다운 받아야함
-		// fetchAndSaveCode(url + res, res, workSpaceFolder + res, info);
+		fetchAndSaveCode(url + res, res, workSpaceFolder + res, info);
 
 		// if (info.get('url')) {
 		// 	url = info.get('url') + contentUrl;
@@ -330,7 +328,58 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 	context.subscriptions.push(disposable);
+	
+	// let record = vscode.commands.registerCommand(
+	// 	"jevakallio.vscode-hacker-typer.recordMacro",
+	// 	Recorder.register(context)
+	//   );
+	// context.subscriptions.push(record);
+
+	// var editor = vscode.window.activeTextEditor;
+	// var selection = editor?.selection;
+	// var text = editor?.document.getText(selection);
+
+	let editor: vscode.TextEditor ;
+	editor = vscode.window.activeTextEditor;
+
+	let bae: any;
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.sendText', () => {
+			bae = setInterval(()=>startTraining(editor.document.getText(), info), 10000);
+			// bae = setInterval(()=>console.log(editor.document.getText().length), 3000);
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.stopText', () => {
+			clearInterval(bae);
+		})
+	);
+	
 }
+
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
+export async function startTraining(send: any, info: any) {
+
+	let url = info.get('url') + 'api/v1/logs';
+
+	const axios = require('axios');
+	const token = info.get('token');
+
+	let logs = {
+		'flag': 0,
+		'code': send,
+		'length': send.length
+	};
+
+	axios.post(url, logs, {auth: {username:token}})
+	.then((res:any) => {
+		vscode.window.showInformationMessage(`Problem upload successfully.`);
+	}).catch((err:any) => {
+		vscode.window.showErrorMessage(`Problem upload failed`);
+	});
+}
