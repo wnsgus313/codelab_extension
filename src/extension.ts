@@ -9,7 +9,7 @@ import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './tre
 import { VsChatProvider } from "./vsChatProvider";
 import {uploadVideo} from "./videos";
 import { Document } from 'cheerio';
-
+import {getLogWebviewContent} from './views';
 
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath =
@@ -61,26 +61,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	disposable = vscode.commands.registerCommand('extension.saveExam', (item: vscode.TreeItem) => {
-		// const configParamsUrl = vscode.workspace.getConfiguration('url');
-		// let url:string | undefined = configParamsUrl.get('problemsUrl') as string;
-
-		let url: string | undefined;
-		if (info.get('url')) {
-			url = info.get('url') + problemsUrl;
-		}
 
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 
 		let res: any = item.label;
-
-		fetchAndSaveProblem(url + res, res, workSpaceFolder + res, info);
-
-		// url = configParamsUrl.get('contentUrl') as string;
-		if (info.get('url')) {
-			url = info.get('url') + contentUrl;
-		}
-		fetchProblemContent(url + res);
 
 		fileName.set("chronicler.dest-folder", workSpaceFolder + res);
 
@@ -221,6 +206,7 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log(info.get('email'));
 			console.log(info.get('password'));
 			console.log(info.get('token'));
+			console.log(info.get('username'));
 		})
 	);
 
@@ -339,15 +325,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// var selection = editor?.selection;
 	// var text = editor?.document.getText(selection);
 
-	let editor: vscode.TextEditor ;
-	editor = vscode.window.activeTextEditor;
 
 	let bae: any;
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.sendText', () => {
-			bae = setInterval(()=>startTraining(editor.document.getText(), info), 10000);
-			// bae = setInterval(()=>console.log(editor.document.getText().length), 3000);
+			let editor: vscode.TextEditor | undefined;
+			editor = vscode.window.activeTextEditor;
+
+			bae = setInterval(()=>startTraining(editor?.document.getText(), info), 10000);
 		})
 	);
 
@@ -356,6 +342,26 @@ export function activate(context: vscode.ExtensionContext) {
 			clearInterval(bae);
 		})
 	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.viewLog', () => {
+		  // Create and show panel
+		  const panel = vscode.window.createWebviewPanel(
+			'viewLog',
+			'View Log',
+			vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                enableCommandUris: true,
+                enableFindWidget: true,
+            }
+		  );
+	
+		  // And set its HTML content
+		  panel.webview.html = getLogWebviewContent();
+		})
+	  );
 	
 }
 

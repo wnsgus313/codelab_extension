@@ -41,6 +41,7 @@ export async function saveToken(info: vscode.Memento) {
 	await axios.get(url, {auth: {username:email, password:password}})
 	.then((res:any) => {
 		info.update('token', res.data['token']);
+		info.update('username', res.data['username']);
 	})
 	.catch((err:any) => {
 		vscode.window.showErrorMessage(`Can not save Token`);
@@ -53,6 +54,7 @@ export async function logout(info: any) {
 	await info.update('email', );
 	await info.update('password', );
 	await info.update('token', );
+	await info.update('username', );
 }
 
 export async function changestatusTrue(info: any) {

@@ -34,11 +34,17 @@
     "onCommand:chronicler.stop",
     "onCommand:extension.saveStudentsCodes",
     "onCommand:extension.sendText",
-    "onCommand:extension.stopText"
+    "onCommand:extension.stopText",
+    "onCommand:extension.extension.viewLog"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "extension.viewLog",
+        "title": "View Log",
+        "category": "Code LabHub"
+      },
       {
         "command": "extension.sendText",
         "title": "Start Training",

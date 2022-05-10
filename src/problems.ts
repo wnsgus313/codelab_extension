@@ -6,6 +6,7 @@ import * as cheerio from "cheerio";
 import * as path from "path";
 
 import {getWebviewContent} from './views';
+import { stringify } from 'querystring';
 
 export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
@@ -122,53 +123,54 @@ export async function fetchProblemList(url: string | undefined, targetPath: stri
 }
 
 export async function fetchAndSaveCode(url: string, title: string, targetPath: string, info: vscode.Memento) {
+
 	const axios = require('axios');
 
 	const token = await info.get('token');
 
-	if (fs.existsSync(targetPath)) {
-		return;
-	}
+	let studentsId: string[] = [];
 
-	vscode.window.showInformationMessage(url);
+	let studentsEmail: string[] = [];
 	
-	console.log(url);
-	console.log(title);
-	console.log(targetPath);
-	
-	// axios.get(url, { auth: {username: token} })
-	// .then((res: any) => {
-	// 	if (!fs.existsSync(targetPath)) {
-	// 		fs.mkdirSync(targetPath);
-	// 	}
+	axios.get(url, {auth: {username:token}})
+	.then((res:any) => {
+		if(!fs.existsSync(targetPath)){
+			fs.mkdirSync(targetPath);
+		}
+		res.data['dir_list'].forEach(async (dirname:string) => {
+			studentsId.push(dirname);
+		});
 
-	// 	res.data['users_id'].forEach((userId: string) => {
-	// 		console.log(userId);
-	// 		vscode.window.showInformationMessage(userId);
-	// 	});
-	// });
-
-	// axios.get(url, { auth: { username: token } })
-	// 	.then((res: any) => {
-	// 		if (!fs.existsSync(targetPath)) {
-	// 			fs.mkdirSync(targetPath);
-	// 		}
-
-	// 		res.data['file_list'].forEach((filename: string) => {
-	// 			for (const id in allStudent) {
-	// 				const saveFilePath = targetPath + '/' + id + '/' + filename;
-	// 				axios.get(url + '/' + id + '/' + filename, { auth: { username: token } })
-	// 					.then((res: any) => {
-	// 						fs.writeFileSync(saveFilePath, res.data);
-	// 						vscode.window.showInformationMessage(`${filename} save successfully.`);
-	// 					})
-	// 					.catch((err: any) => {
-	// 						vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
-	// 					});
-	// 			}
-	// 		});
-
-	// 	}).catch((err: any) => {
-	// 		vscode.window.showErrorMessage(`Please check Problem Id : ${title}`);
-	// 	});
+		res.data['email_list'].forEach(async (email:string) => {
+			studentsEmail.push(email);
+		});
+	})
+	.then(() => {
+		for (const student of studentsId) {
+			axios.get(url + '/' + student, {auth: {username:token}})
+			.then((res:any) => {
+				for(const email of studentsEmail) {
+					if(!fs.existsSync(targetPath + '/' + email)){
+						fs.mkdirSync(targetPath + '/' + email);
+					}
+					res.data['file_list'].forEach((filename:string) => {
+						const saveFilePath = targetPath + '/' + email + '/' + filename;
+						axios.get(url + '/' + student + '/' + filename, {auth: {username:token}})
+						.then((res:any) => {
+							fs.writeFileSync(saveFilePath, res.data);
+							vscode.window.showInformationMessage(`${filename} save successfully.`);
+						})
+						.catch((err:any) => {
+							vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}/${email}`);
+						});
+					});
+				}
+			}).catch((err:any) => {
+				vscode.window.showErrorMessage(`Please check Problem Id : --2--${title}`);
+			});
+		}
+	})
+	.catch((err:any) => {
+		vscode.window.showErrorMessage(`Please check Problem Id : --- ${title} ---`);
+	});
 }
