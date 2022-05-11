@@ -66,7 +66,7 @@ export function getChatWebviewContent(username: string, token: string, url: stri
 	`;
 }
 
-export function getLogWebviewContent()
+export function getLogWebviewContent(url: string, username: unknown)
 {
   return `
   <!DOCTYPE html>
@@ -97,7 +97,7 @@ export function getLogWebviewContent()
    <body onload="loading()">
       <div id="app" style="display:none;">
         <div id="snow"></div>
-        <iframe allowtransparency="true" src="http://siskin21.cafe24.com/"
+        <iframe allowtransparency="true" src="${url}/${username}"
           frameborder="0"></iframe>
       </div>
       <script>

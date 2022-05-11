@@ -8,8 +8,9 @@ import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './dat
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 import { VsChatProvider } from "./vsChatProvider";
 import {uploadVideo} from "./videos";
-import { Document } from 'cheerio';
 import {getLogWebviewContent} from './views';
+
+let endFlag = false;
 
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath =
@@ -325,21 +326,58 @@ export function activate(context: vscode.ExtensionContext) {
 	// var selection = editor?.selection;
 	// var text = editor?.document.getText(selection);
 
-
 	let bae: any;
+
+	let saveOne: any;
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.sendText', () => {
 			let editor: vscode.TextEditor | undefined;
 			editor = vscode.window.activeTextEditor;
+			let minuteOne = '0';
+			let oneMinute = 0;
+			
+			let curr = vscode.workspace;
 
-			bae = setInterval(()=>startTraining(editor?.document.getText(), info), 10000);
+			// detect one keyboard
+			curr.onDidChangeTextDocument((e) => {
+				if (e.contentChanges.length >= 1) {
+					oneMinute++; 
+					minuteOne = oneMinute.toString(); 
+				}
+			});
+			endFlag = true;
+			bae = setInterval(()=>startTraining(editor?.document.getText(), minuteOne, info), 10000);
+			saveOne = editor?.document.getText();
 		})
 	);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.stopText', () => {
+
+			endFlag = false;
+
 			clearInterval(bae);
+
+			let url = info.get('url') + 'api/v1/logs';
+
+			const axios = require('axios');
+			const token = info.get('token');
+
+			let logs = {
+				'flag': 1,
+				'code': saveOne,
+				'length': 0
+			};
+
+			axios.post(url, logs, {auth: {username:token}})
+			.then((res:any) => {
+				vscode.window.showInformationMessage(`Problem upload successfully.`);
+			}).catch((err:any) => {
+				vscode.window.showErrorMessage(`Problem upload failed`);
+			});
+
+			vscode.window.showInformationMessage('End Practice');
 		})
 	);
 
@@ -357,9 +395,11 @@ export function activate(context: vscode.ExtensionContext) {
                 enableFindWidget: true,
             }
 		  );
-	
+
+		  let username = info.get('username');
+		  let url = info.get('url') + 'practice';
 		  // And set its HTML content
-		  panel.webview.html = getLogWebviewContent();
+		  panel.webview.html = getLogWebviewContent(url, username);
 		})
 	  );
 	
@@ -369,23 +409,29 @@ export function activate(context: vscode.ExtensionContext) {
 // this method is called when your extension is deactivated
 export function deactivate() {}
 
-export async function startTraining(send: any, info: any) {
+export async function startTraining(send: any, minuteOne: any, info: any) {
 
-	let url = info.get('url') + 'api/v1/logs';
+	if (endFlag === true)
+	{
 
-	const axios = require('axios');
-	const token = info.get('token');
+		let url = info.get('url') + 'api/v1/logs';
 
-	let logs = {
-		'flag': 0,
-		'code': send,
-		'length': send.length
-	};
+		const axios = require('axios');
+		const token = info.get('token');
 
-	axios.post(url, logs, {auth: {username:token}})
-	.then((res:any) => {
-		vscode.window.showInformationMessage(`Problem upload successfully.`);
-	}).catch((err:any) => {
-		vscode.window.showErrorMessage(`Problem upload failed`);
-	});
+		minuteOne = Number(minuteOne);
+
+		let logs = {
+			'flag': 0,
+			'code': send,
+			'length': minuteOne
+		};
+
+		axios.post(url, logs, {auth: {username:token}})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`Problem upload successfully.`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Problem upload failed`);
+		});
+	}		
 }
