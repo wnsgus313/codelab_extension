@@ -208,6 +208,7 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log(info.get('password'));
 			console.log(info.get('token'));
 			console.log(info.get('username'));
+			console.log(info.get('role'));
 		})
 	);
 
@@ -347,7 +348,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			});
 			endFlag = true;
-			bae = setInterval(()=>startTraining(editor?.document.getText(), minuteOne, info), 10000);
+			bae = setInterval(()=>startTraining(editor?.document.getText(), minuteOne, info), 4000);
 			saveOne = editor?.document.getText();
 		})
 	);
@@ -366,9 +367,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 			let logs = {
 				'flag': 1,
-				'code': saveOne,
+				'code': 'The End',
 				'length': 0
 			};
+
+			vscode.window.showInformationMessage('saveOne: ' + saveOne);
 
 			axios.post(url, logs, {auth: {username:token}})
 			.then((res:any) => {
