@@ -2,13 +2,14 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList, fetchAndSaveCode } from './problems';
+import { uploadProblem, fetchAndSaveProblem, deleteProblem, fetchProblemContent, fetchProblemList, fetchAndSaveCode, uploadPdf } from './problems';
 import {submitCode} from './codes';
-import {askUserForSave, changestatusFalse, changestatusTrue, logout} from './data';
+import {askUserForSave, changestatusFalse, changestatusTrue, logout, inputRoomName, inputRoomName2, deleteRoomName, inputStudentEmail, saveToken} from './data';
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 import { VsChatProvider } from "./vsChatProvider";
 import {uploadVideo} from "./videos";
-import {getLogWebviewContent} from './views';
+import {getLogWebviewContent, getFirstWebview} from './views';
+import { table } from 'console';
 
 let endFlag = false;
 
@@ -17,6 +18,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
 			? vscode.workspace.workspaceFolders[0].uri.fsPath
 			: undefined;
+
+	vscode.commands.executeCommand('extension.firstView');
 
 	vscode.window.createTreeView('problem-resolved', {
 		treeDataProvider: new SolvedProblems(rootPath),
@@ -34,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const videoUrl = 'api/v1/video/';
 	const editJsonFile = require("edit-json-file");
 	const home = process.env.HOME || process.env.USERPROFILE;
+	const labUrl = 'api/v1/labs';
 
 	const fileName = editJsonFile(`${home}/Library/Application\ Support/Code/User/settings.json`);
 
@@ -117,6 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		uploadProblem(url+res, res, workSpaceFolder + res, info);
+		uploadPdf(url+res, res, workSpaceFolder + res, info);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -209,6 +214,7 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log(info.get('token'));
 			console.log(info.get('username'));
 			console.log(info.get('role'));
+			console.log(info.get('room'));
 		})
 	);
 
@@ -371,8 +377,6 @@ export function activate(context: vscode.ExtensionContext) {
 				'length': 0
 			};
 
-			vscode.window.showInformationMessage('saveOne: ' + saveOne);
-
 			axios.post(url, logs, {auth: {username:token}})
 			.then((res:any) => {
 				vscode.window.showInformationMessage(`Problem upload successfully.`);
@@ -406,6 +410,192 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	  );
 	
+	disposable = vscode.commands.registerCommand('extension.makeLab', async (item: vscode.TreeItem) => {
+
+		const axios = require('axios');
+
+		let labName: any = await inputRoomName();
+
+		let url = info.get('url') + labUrl;
+
+		let token = info.get('token');
+
+		let sendName = {
+			'labName': labName
+		};
+
+		axios.post(url, sendName, {auth: {username:token}})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`Make Lab successfully.`);
+			vscode.commands.executeCommand('extension.getLabs');
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Make Lab failed`);
+		});
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.getLabs', async (item: vscode.TreeItem) => {
+
+		saveToken(info);
+
+		const axios = require('axios');
+
+		let url = info.get('url') + labUrl;
+
+		let token = info.get('token');
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+		axios.get(url, {auth: {username:token}})
+		.then((res:any) => {
+			fs.writeFileSync(path.join(workSpaceFolder, 'labs.json'), JSON.stringify(res.data));
+			// fs.writeFileSync(workSpaceFolder, JSON.stringify(res.data));
+			// vscode.window.showInformationMessage(JSON.stringify(res.data));
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Get Lab fail 2`);
+		});
+
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.deleteLab', async (item: vscode.TreeItem) => {
+
+		const axios = require('axios');
+
+		let url = info.get('url') + labUrl + '/delete';
+
+		let token = info.get('token');
+
+		let deleteLab: any = await deleteRoomName();
+
+		let sendName = {
+			'deleteLab': deleteLab
+		};
+
+		vscode.window.showInformationMessage(`Do you want to delete ${deleteLab} ?`, "Yes", "No")
+  		.then(answer => {
+    		if (answer === "Yes") {
+				axios.post(url, sendName, {auth: {username:token}})
+				.then((res:any) => {
+					vscode.window.showInformationMessage(`Delete Lab successfully.`);
+					vscode.commands.executeCommand('extension.getLabs');
+					saveToken(info);
+				}).catch((err:any) => {
+					vscode.window.showErrorMessage(`Delete Lab failed`);
+				});
+    		}
+			else {
+				vscode.window.showInformationMessage("Exit");
+			}
+  		});
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.addStudent2Lab', async (item: vscode.TreeItem) => {
+
+		const axios = require('axios');
+
+		let token = info.get('token');
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		// let res: any = item.label;
+
+		let room = await inputRoomName2();
+
+		let email = await inputStudentEmail();
+
+		let url = info.get('url') + 'api/v1/invite';
+
+		let sendInfo = {
+			'email': email,
+			'lab': room
+		};
+
+		axios.post(url, sendInfo, {auth: {username:token}})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`Success to add ${email} to ${room}`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Fail to add ${email} to ${room}`);
+		});
+
+
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('extension.addTA', async (item: vscode.TreeItem) => {
+		
+		const axios = require('axios');
+
+		let token = info.get('token');
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		// let res: any = item.label;
+
+		let room = await inputRoomName2();
+
+		let email = await inputStudentEmail();
+
+		let url = info.get('url') + 'api/v1/inviteTA';
+
+		let sendInfo = {
+			'email': email,
+			'lab': room
+		};
+
+		axios.post(url, sendInfo, {auth: {username:token}})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`Success to add ${email} to ${room}'s TA and invite to ${room}`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Fail to add ${email} to ${room}'s TA`);
+		});
+		
+	});
+	context.subscriptions.push(disposable);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.firstView', () => {
+		  // Create and show panel
+		  const panel = vscode.window.createWebviewPanel(
+			'firstView',
+			'Welcome CodeLabHub',
+			vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                enableCommandUris: true,
+                enableFindWidget: true,
+            }
+		  );
+
+		  const axios = require('axios');
+
+		  let token = info.get('token');
+
+		  let username = info.get('username');
+		  let url = 'http://siskin21.cafe24.com/codelab/api/v1/firstView';
+
+		  axios.get(url, {auth: {username:token}})
+		  .then((res:any) => {
+			  // And set its HTML content
+			  panel.webview.html = getFirstWebview(res.data['users']);
+			}).catch((err:any) => {
+				vscode.window.showErrorMessage(`Start Error`);
+			});
+
+
+			
+
+		  
+		  
+		})
+	  );
+
+
 }
 
 

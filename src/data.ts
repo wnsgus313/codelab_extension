@@ -43,6 +43,7 @@ export async function saveToken(info: vscode.Memento) {
 		info.update('token', res.data['token']);
 		info.update('username', res.data['username']);
 		info.update('role', res.data['role']);
+		info.update('room', res.data['room']);
 	})
 	.catch((err:any) => {
 		vscode.window.showErrorMessage(`Can not save Token`);
@@ -72,4 +73,28 @@ export function changestatusFalse(info: any) {
 
 	vscode.commands.executeCommand('setContext', 'extensionSelectionMode', false);
 
+}
+
+export function inputRoomName() {
+	return vscode.window.showInputBox({
+		prompt: 'input room name to make'
+	});
+}
+
+export function deleteRoomName() {
+	return vscode.window.showInputBox({
+		prompt: 'input room name to delete'
+	});
+}
+
+export function inputStudentEmail() {
+	return vscode.window.showInputBox({
+		prompt: 'input student email to register'
+	});
+}
+
+export function inputRoomName2() {
+	return vscode.window.showInputBox({
+		prompt: 'input room name to invite student'
+	});
 }

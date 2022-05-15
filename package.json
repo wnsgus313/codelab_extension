@@ -35,11 +35,22 @@
     "onCommand:extension.saveStudentsCodes",
     "onCommand:extension.sendText",
     "onCommand:extension.stopText",
-    "onCommand:extension.extension.viewLog"
+    "onCommand:extension.extension.viewLog",
+    "onCommand:extension.makeLab",
+    "onCommand:extension.getLabs",
+    "onCommand:extension.deleteLab",
+    "onCommand:extension.addStudent2Lab",
+    "onCommand:extension.addTA",
+    "onCommand:extension.firstView"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "extension.firstView",
+        "title": "First View",
+        "category": "Code LabHub"
+      },
       {
         "command": "extension.viewLog",
         "title": "View Log",
@@ -137,6 +148,31 @@
         "title": "Upload Exam",
         "category": "Code LabHub",
         "command": "extension.uploadExam"
+      },
+      {
+        "command": "extension.makeLab",
+        "title": "Make Lab",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "extension.getLabs",
+        "title": "Get Labs",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "extension.deleteLab",
+        "title": "Delete Lab",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "extension.addStudent2Lab",
+        "title": "Add Student",
+        "category": "Code LabHub"
+      },
+      {
+        "command": "extension.addTA",
+        "title": "Add TA",
+        "category": "Code LabHub"
       }
     ],
     "viewsContainers": {
@@ -300,6 +336,9 @@
     "form-data": "^4.0.0",
     "got": "^12.0.4",
     "node-schedule": "^2.1.0",
+    "pdf2json": "^2.0.1",
+    "pdfjs": "^2.4.7",
+    "pdfjs-dist": "^2.13.216",
     "promise-queue": "^2.2.5",
     "vscode-cache": "^0.3.0"
   }

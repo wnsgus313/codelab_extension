@@ -4,33 +4,32 @@ import * as url from "url";
 import * as axios from "axios";
 import * as cheerio from "cheerio";
 import * as path from "path";
-
+import got from 'got';
+import FormData = require('form-data');
 import {getWebviewContent} from './views';
 import { stringify } from 'querystring';
 
 export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
-	console.log(targetPath); // /Users/junhyeonbae/Desktop/vscode연습/백준문제풀이/1
 	
 	const token = await info.get('token');
 
 	let fileLists:string[] = fs.readdirSync(targetPath);
 
-	console.log(fileLists); // ['a.c', 'a.py', 'a.txt', 'b.c', 'main.c']
-
 	let filedata:string[] = [];
 	let filename:string[] = [];
 	fileLists.forEach((file) => {
-		filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
-		filename.push(file);
-
-		// files['filename'] = file;
-		// files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
+		let reg = /(.*?)\.(pdf)$/;
+        if (!file.match(reg)){
+            filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
+			filename.push(file);
+			console.log('pdf아닌거: ' + filename);
+        }
 	});
 
 	let files = {
 		'filename': filename,
-		'file': filedata,
+		'file': filedata
 	};
 
 	axios.post(url, {files}, {auth: {username:token}})
@@ -39,6 +38,37 @@ export async function uploadProblem(url:string, title:string, targetPath:string,
 	}).catch((err:any) => {
 		vscode.window.showErrorMessage(`Problem upload failed`);
 	});
+
+}
+
+export async function uploadPdf(url:string, title:string, targetPath:string, info:vscode.Memento)
+{
+	const formData = new FormData();
+    const token = await info.get('token');
+    
+    let fileLists:string[] = fs.readdirSync(targetPath);
+
+    fileLists.forEach((file) => {
+        let reg = /(.*?)\.(pdf|PDF)$/;
+        if (file.match(reg)){
+            formData.append('file', fs.createReadStream(path.join(targetPath, file)), file);
+        }
+	});
+
+    const auth = 'Basic ' + Buffer.from(token + ':').toString('base64');
+
+    try {
+        let res = await got.post(url + '/pdf', {
+            body: formData,
+            headers: {
+                "Authorization": auth
+            }
+        });
+    
+        vscode.window.showInformationMessage('Sucess upload video');
+    } catch (e) {
+        vscode.window.showErrorMessage(`Video upload failed`);
+    }
 }
 
 export async function fetchAndSaveProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
