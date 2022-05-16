@@ -7,7 +7,8 @@ import * as path from "path";
 import got from 'got';
 import FormData = require('form-data');
 import {getWebviewContent} from './views';
-import { stringify } from 'querystring';
+
+
 
 export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
@@ -78,6 +79,8 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 
 	const token = await info.get('token');
 
+	const auth = 'Basic ' + Buffer.from(token + ':').toString('base64');
+
 	if (fs.existsSync(targetPath)){
 		return;
 	}
@@ -90,14 +93,19 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 		
 		res.data['file_list'].forEach((filename:string) => {
 			const saveFilePath = targetPath + '/' + filename;
-			axios.get(url + '/' + filename, {auth: {username:token}})
-			.then((res:any) => {
-				fs.writeFileSync(saveFilePath, res.data);
-				vscode.window.showInformationMessage(`${filename} save successfully.`);
-			})
-			.catch((err:any) => {
-				vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
-			});
+			let reg = /(.*?)\.(pdf)$/;
+			if (!filename.match(reg)){
+				axios.get(url + '/' + filename, {auth: {username:token}})
+				.then((res:any) => {
+					fs.writeFileSync(saveFilePath, res.data);
+				})
+				.catch((err:any) => {
+					vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}`);
+				});
+			}
+			else {
+				downloadImage(url + '/' + filename + '.pdf', saveFilePath, auth);
+			}
 		});
 
 	}).catch((err:any) => {
@@ -202,5 +210,86 @@ export async function fetchAndSaveCode(url: string, title: string, targetPath: s
 	})
 	.catch((err:any) => {
 		vscode.window.showErrorMessage(`Please check Problem Id : --- ${title} ---`);
+	});
+}
+
+
+async function downloadImage(url: any, saveFilePath:any, token: any) {
+	const fs = require('fs');
+	const path = require('path');
+	const axios = require('axios');
+
+	const path2 = path.resolve(saveFilePath);
+	const writer = fs.createWriteStream(path2);
+
+	const response = await axios({
+		url,
+		method: 'GET',
+		responseType: 'stream',
+		headers: {
+			"Authorization": token
+		}
+	});
+
+	response.data.pipe(writer);
+
+	return new Promise((resolve, reject) => {
+		writer.on('finish', resolve);
+		writer.on('error', reject);
+	});
+}
+
+export async function downloadVideo(url: string, title: string, targetPath: string, info: vscode.Memento) {
+
+	const axios = require('axios');
+
+	const token = await info.get('token');
+
+	const auth = 'Basic ' + Buffer.from(token + ':').toString('base64');
+
+	let studentsId: string[] = [];
+
+	let studentsEmail: string[] = [];
+	
+	axios.get(url, {auth: {username:token}})
+	.then((res:any) => {
+		if(!fs.existsSync(targetPath)){
+			fs.mkdirSync(targetPath);
+		}
+		res.data['dir_list'].forEach(async (dirname:string) => {
+			studentsId.push(dirname);
+		});
+
+		res.data['email_list'].forEach(async (email:string) => {
+			studentsEmail.push(email);
+		});
+	})
+	.then(() => {
+		for (const student of studentsId) {
+			axios.get(url + '/' + student, {auth: {username:token}})
+			.then((res:any) => {
+				for(const email of studentsEmail) {
+					if(!fs.existsSync(targetPath + '/video')){
+						fs.mkdirSync(targetPath + '/video');
+					}
+					res.data['file_list'].forEach((filename:string) => {
+						const saveFilePath = targetPath + '/video/' + filename;
+						axios.get(url + '/' + student + '/' + filename, {auth: {username:token}})
+						.then((res:any) => {
+							downloadImage(url + '/' + student + '/' + filename, saveFilePath, auth);
+							vscode.window.showInformationMessage(`${filename} save successfully.`);
+						})
+						.catch((err:any) => {
+							vscode.window.showErrorMessage(`Fail save ${filename} in Problem ${title}/${email}`);
+						});
+					});
+				}
+			}).catch((err:any) => {
+				vscode.window.showErrorMessage(`Please check Problem Id : --543--${title}`);
+			});
+		}
+	})
+	.catch((err:any) => {
+		vscode.window.showErrorMessage(`Please check Problem Id : 555--- ${title} ---`);
 	});
 }

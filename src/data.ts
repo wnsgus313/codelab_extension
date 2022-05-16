@@ -57,7 +57,7 @@ export async function logout(info: any) {
 	await info.update('password', );
 	await info.update('token', );
 	await info.update('username', );
-	await info.updata('role', );
+	await info.update('role', );
 }
 
 export async function changestatusTrue(info: any) {
