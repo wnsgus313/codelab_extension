@@ -15,7 +15,7 @@ export function getWebviewContent(title:string, name:string, body:string) {
 	</html>`;
 }
 
-export function getChatWebviewContent(username: string, token: string, url: string)
+export function getChatWebviewContent(url: any, lab: any, token: any, username: any )
 {
   return `
   <!DOCTYPE html>
@@ -46,7 +46,7 @@ export function getChatWebviewContent(username: string, token: string, url: stri
    <body onload="loading()">
       <div id="app" style="display:none;">
         <div id="snow"></div>
-        <iframe allowtransparency="true" src="${url}chat?token=${token}&username=${username}"
+        <iframe allowtransparency="true" src="${url}${lab}/chat?token=${token}&username=${username}"
           frameborder="0"></iframe>
       </div>
       <script>

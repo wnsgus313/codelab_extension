@@ -1,0 +1,33 @@
+{
+    "labs": [
+        {
+            "lab": "DS",
+            "problems": [
+                {
+                    "title": "Bracket",
+                    "evaluation": "correct",
+                    "submission": [
+						{
+							"name": "Bae",
+							"evaluation": "wrong"
+						},
+						{
+							"name": "Kim",
+							"evaluation": "correct"
+						}
+					]
+                }
+            ],
+            "members": [
+                {
+                    "name": "Bae",
+                    "role": "Professor"
+                }
+            ]
+        }
+    ],
+    "roles": [
+        "admin",
+        "student"
+    ]
+}

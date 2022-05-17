@@ -24,7 +24,6 @@ export async function uploadProblem(url:string, title:string, targetPath:string,
         if (!file.match(reg)){
             filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
 			filename.push(file);
-			console.log('pdf아닌거: ' + filename);
         }
 	});
 
@@ -65,7 +64,6 @@ export async function uploadPdf(url:string, title:string, targetPath:string, inf
                 "Authorization": auth
             }
         });
-    
         vscode.window.showInformationMessage('Sucess upload video');
     } catch (e) {
         vscode.window.showErrorMessage(`Video upload failed`);
@@ -92,7 +90,7 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 		}
 		
 		res.data['file_list'].forEach((filename:string) => {
-			const saveFilePath = targetPath + '/' + filename;
+			const saveFilePath = targetPath + '/DS/' + filename;
 			let reg = /(.*?)\.(pdf)$/;
 			if (!filename.match(reg)){
 				axios.get(url + '/' + filename, {auth: {username:token}})
@@ -114,6 +112,7 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 }
 
 export async function deleteProblem(url:string, title:string, info:vscode.Memento) {
+	
 	const axios = require('axios');
 
 	const token = await info.get('token');

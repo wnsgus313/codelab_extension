@@ -8,7 +8,7 @@ import {askUserForSave, changestatusFalse, changestatusTrue, logout, inputRoomNa
 import { Dependency, ReSolvedProblems, SolvedProblems, AllProblems } from './treeView';
 import { VsChatProvider } from "./vsChatProvider";
 import {uploadVideo} from "./videos";
-import {getLogWebviewContent, getFirstWebview} from './views';
+import {getLogWebviewContent, getFirstWebview, getChatWebviewContent} from './views';
 import { table } from 'console';
 
 let endFlag = false;
@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		let res: any = item.label;
 
-		fetchAndSaveProblem(url+res, res, workSpaceFolder + res, info);
+		fetchAndSaveProblem(url + 'DS/' + res, res, workSpaceFolder + 'DS/' + res, info);
 
 	});
 	context.subscriptions.push(disposable);
@@ -115,8 +115,8 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Please enter problem ID!");
 			return;
 		}
-		uploadProblem(url+res, res, workSpaceFolder + res, info);
-		uploadPdf(url+res, res, workSpaceFolder + res, info);
+		uploadProblem(url + 'DS/' + res, res, workSpaceFolder + 'DS/' + res, info);
+		uploadPdf(url + 'DS/' + res, res, workSpaceFolder + 'DS/' + res, info);
 		});
 	});
 	context.subscriptions.push(disposable);
@@ -133,9 +133,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
-		let res: any = item.label;
+		// let res: any = item.label;
 
-		deleteProblem(url+res, res, info);
+		deleteProblem(url + 'DS/' + 'Bracket', 'Bracket', info);
 	});
 	context.subscriptions.push(disposable);
 
@@ -292,13 +292,37 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 	
-	const vsChatSidebarProvider = new VsChatProvider(context.extensionUri, info);
-	let sidebar = vscode.window.registerWebviewViewProvider(
-		"codelabChat.view",
-		vsChatSidebarProvider
-	);
+	// const vsChatSidebarProvider = new VsChatProvider(context.extensionUri, info);
+	// let sidebar = vscode.window.registerWebviewViewProvider(
+	// 	"codelabChat.view",
+	// 	vsChatSidebarProvider
+	// );
 	
-	context.subscriptions.push(sidebar);
+	// context.subscriptions.push(sidebar);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.chatroom', () => {
+		  // Create and show panel
+		  const panel = vscode.window.createWebviewPanel(
+			'chatroom',
+			'Chat Room',
+			vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                enableCommandUris: true,
+                enableFindWidget: true,
+            }
+		  );
+
+		  let username = info.get('username');
+		  let url = info.get('url');
+		  const token = info.get('token');
+		  let lab = 'DS';
+		  // And set its HTML content
+		  panel.webview.html = getChatWebviewContent(url, lab, token, username);
+		})
+	  );
 
 
 	disposable = vscode.commands.registerCommand('extension.uploadExam', (item: vscode.TreeItem) => {
@@ -317,16 +341,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 	context.subscriptions.push(disposable);
-	
-	// let record = vscode.commands.registerCommand(
-	// 	"jevakallio.vscode-hacker-typer.recordMacro",
-	// 	Recorder.register(context)
-	//   );
-	// context.subscriptions.push(record);
-
-	// var editor = vscode.window.activeTextEditor;
-	// var selection = editor?.selection;
-	// var text = editor?.document.getText(selection);
 
 	let bae: any;
 
