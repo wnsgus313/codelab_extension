@@ -20,9 +20,6 @@ export async function submitCode(url:string, title:string, targetPath:string, in
 	fileLists.forEach((file) => {
 		filedata.push(fs.readFileSync(path.join(targetPath, file), "utf-8"));
 		filename.push(file);
-
-		// files['filename'] = file;
-		// files['file'] = fs.readFileSync(targetPath+'/'+file, "utf-8");
 	});
 
 	let files = {

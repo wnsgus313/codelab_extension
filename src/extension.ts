@@ -85,10 +85,10 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 
-		let res: any = item.label;
+		// let res: any = item.label;
 
 		// res는 문제 타이틀로 된 디렉토리 이름 -> 이 안에서 있는 모든 디렉토리 안에 들어가서 파일 다운 받아야함
-		fetchAndSaveCode(url + res, res, workSpaceFolder + res, info);
+		fetchAndSaveCode(url + 'DS/Bracket', 'Bracket', workSpaceFolder + 'DS/Bracket', info);
 
 		// if (info.get('url')) {
 		// 	url = info.get('url') + contentUrl;
@@ -151,9 +151,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
-		let res: any = item.label;
+		// let res: any = item.label;
 
-		submitCode(url + '21700332/' + res, res, workSpaceFolder + res, info);
+		submitCode(url + 'DS/' + 'Bracket', 'Bracket', workSpaceFolder + 'DS/Bracket', info);
 	});
 	context.subscriptions.push(disposable);
 
