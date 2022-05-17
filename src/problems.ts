@@ -112,7 +112,7 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 }
 
 export async function deleteProblem(url:string, title:string, info:vscode.Memento) {
-	
+
 	const axios = require('axios');
 
 	const token = await info.get('token');
