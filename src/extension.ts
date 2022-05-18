@@ -375,7 +375,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			clearInterval(bae);
 
-			let url = info.get('url') + 'api/v1/logs';
+			let url = info.get('url') + 'api/v1/logs/DS';
 
 			const axios = require('axios');
 			const token = info.get('token');
@@ -634,7 +634,7 @@ export async function startTraining(send: any, minuteOne: any, info: any) {
 	if (endFlag === true)
 	{
 
-		let url = info.get('url') + 'api/v1/logs';
+		let url = info.get('url') + 'api/v1/logs/DS';
 
 		const axios = require('axios');
 		const token = info.get('token');

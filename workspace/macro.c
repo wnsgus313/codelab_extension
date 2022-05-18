@@ -1,11 +1,7 @@
 #include <stdio.h>
 int main()
 {
-    
-    asd
-    asd
-    asd
-    asd
-    asd
-    asd
+    int a = 0;
+    int b = 0;
+    return 0;
 }
