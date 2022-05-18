@@ -42,11 +42,17 @@
     "onCommand:extension.addTA",
     "onCommand:extension.firstView",
     "onCommand:extension.saveVideos",
-    "onCommand:extension.chatroom"
+    "onCommand:extension.chatroom",
+    "onCommand:extension.deleteStudentFromLab"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "extension.deleteStudentFromLab",
+        "title": "Delete Student From Lab",
+        "category": "Code LabHub"
+      },
       {
         "command": "extension.chatroom",
         "title": "Chat Room",

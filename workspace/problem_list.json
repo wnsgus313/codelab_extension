@@ -2,108 +2,61 @@
     "labs": [
         {
             "lab": "DS",
-            "members": [],
+            "members": [
+                {
+                    "name": "user1",
+                    "role": "TA"
+                }
+            ],
             "problems": [
                 {
+                    "evaluation": "correct",
                     "submission": [
                         {
-                            "evaluation": "wrong",
-                            "name": "bae"
-                        },
-                        {
-                            "evaluation": "wrong",
+                            "evaluation": "correct",
                             "name": "user1"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user2"
                         }
                     ],
                     "title": "Bracket"
                 },
                 {
-                    "submission": [
-                        {
-                            "evaluation": "wrong",
-                            "name": "bae"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user1"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user2"
-                        }
-                    ],
-                    "title": "Postfix2"
-                },
-                {
-                    "title": "Bracket"
-                },
-                {
+                    "submission": [],
                     "title": "Postfix2"
                 }
             ]
         },
         {
             "lab": "C_practice",
-            "members": [],
+            "members": [
+                {
+                    "name": "user1",
+                    "role": "TA"
+                }
+            ],
             "problems": [
                 {
-                    "submission": [
-                        {
-                            "evaluation": "wrong",
-                            "name": "bae"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user1"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user2"
-                        }
-                    ],
+                    "submission": [],
                     "title": "A001"
                 },
                 {
-                    "submission": [
-                        {
-                            "evaluation": "wrong",
-                            "name": "bae"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user1"
-                        },
-                        {
-                            "evaluation": "wrong",
-                            "name": "user2"
-                        }
-                    ],
-                    "title": "A002"
-                },
-                {
-                    "title": "A001"
-                },
-                {
+                    "submission": [],
                     "title": "A002"
                 }
             ]
         },
         {
-            "lab": "DS",
-            "members": [],
-            "problems": []
-        },
-        {
-            "lab": "C_practice",
-            "members": [],
+            "lab": "Oss",
+            "members": [
+                {
+                    "name": "user1",
+                    "role": "TA"
+                }
+            ],
             "problems": []
         }
     ],
     "roles": [
+        "admin",
         "admin",
         "admin"
     ]

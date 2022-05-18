@@ -530,8 +530,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}).catch((err:any) => {
 			vscode.window.showErrorMessage(`Fail to add ${email} to ${room}`);
 		});
-
-
 	});
 	context.subscriptions.push(disposable);
 
@@ -622,6 +620,36 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('extension.deleteStudentFromLab', async (item: vscode.TreeItem) => {
+
+		const axios = require('axios');
+
+		let token = info.get('token');
+
+		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
+			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
+
+		// let res: any = item.label;
+
+		let room = await inputRoomName2();
+
+		let email = await inputStudentEmail();
+
+		let url = info.get('url') + 'api/v1/deleteStudentFromLab';
+
+		let sendInfo = {
+			'email': email,
+			'lab': room
+		};
+
+		axios.post(url, sendInfo, {auth: {username:token}})
+		.then((res:any) => {
+			vscode.window.showInformationMessage(`Success to delete ${email} to ${room}`);
+		}).catch((err:any) => {
+			vscode.window.showErrorMessage(`Fail to delete ${email} to ${room}`);
+		});
+	});
+	context.subscriptions.push(disposable);
 
 }
 
