@@ -412,10 +412,11 @@ export function activate(context: vscode.ExtensionContext) {
             }
 		  );
 
-		  let username = info.get('username');
-		  let url = info.get('url') + 'practice';
+		  const token = info.get('token');
+
+		  let url = info.get('url') + 'DS/' + 'practice';
 		  // And set its HTML content
-		  panel.webview.html = getLogWebviewContent(url, username);
+		  panel.webview.html = getLogWebviewContent(url, token);
 		})
 	  );
 	

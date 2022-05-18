@@ -66,7 +66,7 @@ export function getChatWebviewContent(url: any, lab: any, token: any, username: 
 	`;
 }
 
-export function getLogWebviewContent(url: string, username: unknown)
+export function getLogWebviewContent(url: string, token: any)
 {
   return `
   <!DOCTYPE html>
@@ -97,7 +97,7 @@ export function getLogWebviewContent(url: string, username: unknown)
    <body onload="loading()">
       <div id="app" style="display:none;">
         <div id="snow"></div>
-        <iframe allowtransparency="true" src="${url}/${username}"
+        <iframe allowtransparency="true" src="${url}?token=${token}"
           frameborder="0"></iframe>
       </div>
       <script>

@@ -8,8 +8,6 @@ import got from 'got';
 import FormData = require('form-data');
 import {getWebviewContent} from './views';
 
-
-
 export async function uploadProblem(url:string, title:string, targetPath:string, info:vscode.Memento) {
 	const axios = require('axios');
 	
