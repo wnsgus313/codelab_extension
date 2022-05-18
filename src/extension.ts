@@ -65,9 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 
-		let res: any = item.label;
+		// let res: any = item.label;
 
-		fileName.set("chronicler.dest-folder", workSpaceFolder + res);
+		fileName.set("chronicler.dest-folder", workSpaceFolder + 'DS/Bracket');
 
 		fileName.save();
 
@@ -334,10 +334,10 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 
-		let res: any = item.label;
+		// let res: any = item.label;
 		// vscode.commands.executeCommand("problemProvider.submitCode", res);
 
-		uploadVideo(url + res, res, workSpaceFolder + res, info);
+		uploadVideo(url + 'DS/Bracket', 'Bracket', workSpaceFolder + 'DS/Bracket', info);
 
 	});
 	context.subscriptions.push(disposable);
@@ -437,7 +437,7 @@ export function activate(context: vscode.ExtensionContext) {
 		axios.post(url, sendName, {auth: {username:token}})
 		.then((res:any) => {
 			vscode.window.showInformationMessage(`Make Lab successfully.`);
-			vscode.commands.executeCommand('extension.getLabs');
+			// vscode.commands.executeCommand('extension.getLabs');
 		}).catch((err:any) => {
 			vscode.window.showErrorMessage(`Make Lab failed`);
 		});
