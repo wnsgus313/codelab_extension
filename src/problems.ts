@@ -88,7 +88,7 @@ export async function fetchAndSaveProblem(url:string, title:string, targetPath:s
 		}
 		
 		res.data['file_list'].forEach((filename:string) => {
-			const saveFilePath = targetPath + '/DS/' + filename;
+			const saveFilePath = targetPath + '/' + filename;
 			let reg = /(.*?)\.(pdf)$/;
 			if (!filename.match(reg)){
 				axios.get(url + '/' + filename, {auth: {username:token}})

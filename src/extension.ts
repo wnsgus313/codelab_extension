@@ -53,9 +53,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const configParamsWS = vscode.workspace.getConfiguration('workspace'),
 			workSpaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath + '/';
 		
-		let res: any = item.label;
+		// let res: any = item.label;
 
-		fetchAndSaveProblem(url + 'DS/' + res, res, workSpaceFolder + 'DS/' + res, info);
+		fetchAndSaveProblem(url + 'DS/Bracket', 'Bracket', workSpaceFolder + 'DS/Bracket', info);
 
 	});
 	context.subscriptions.push(disposable);
